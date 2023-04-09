@@ -1,0 +1,755 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="头文件\openGL_dependent">
+      <UniqueIdentifier>{26d90901-ecbd-41da-8777-13a3412196c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders">
+      <UniqueIdentifier>{df32ba0e-0b23-49fa-8fab-72b8212e26fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedOpenGL">
+      <UniqueIdentifier>{642234e9-ce53-4871-b975-eaf6789c8ecf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_before_light">
+      <UniqueIdentifier>{1e1a9ab5-2654-4691-b34e-cbf89a4b1494}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_assimp">
+      <UniqueIdentifier>{c7f247ba-b759-47c0-835c-0fffd6a3d6b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedOpenGL\1">
+      <UniqueIdentifier>{6d7d983d-417d-488a-be4e-2cdb42f93c4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedOpenGL\2">
+      <UniqueIdentifier>{0c79979a-8c19-4d33-b7fc-f3a5fa6220a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedOpenGL\3">
+      <UniqueIdentifier>{f5d27346-cb21-4fb9-924a-f7635a8e6288}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedOpenGL\4">
+      <UniqueIdentifier>{8e33227b-7976-41ea-9017-d90c86a39cbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedOpenGL\5">
+      <UniqueIdentifier>{440507c7-b72f-4955-a4e8-bc09bcd923ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedOpenGL\6">
+      <UniqueIdentifier>{9b9fac69-3687-4636-b3e3-1d98b3739d1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedOpenGL\7">
+      <UniqueIdentifier>{c2317d69-fd64-4ad9-a8a8-5a157d12fda9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedOpenGL\8">
+      <UniqueIdentifier>{f7e253e4-186b-42b6-bbed-63088eee6bbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedLight">
+      <UniqueIdentifier>{ea0a0598-a11b-4070-8774-69e5d359ade8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedLight\1">
+      <UniqueIdentifier>{419f99a8-7cd3-4733-8d12-69c51189c5b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedLight\2">
+      <UniqueIdentifier>{ff25c17a-8e4f-472a-9f64-cf2edc04b127}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedLight\3">
+      <UniqueIdentifier>{7981442f-6363-4b65-b8b2-06df0dda5841}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedLight\4">
+      <UniqueIdentifier>{ee87c065-0080-49e3-91fa-af54bb5fe77a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedLight\5">
+      <UniqueIdentifier>{1b74d759-097d-40b4-b29d-996d319b0c30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedLight\6">
+      <UniqueIdentifier>{5816771e-8980-4682-9de6-1604faf4ac37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedLight\7">
+      <UniqueIdentifier>{093a96c5-0bc5-48f3-b1ec-b51c4c4a4c46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedLight\8">
+      <UniqueIdentifier>{260c237f-9560-4904-87f8-731484895796}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_advancedLight\9">
+      <UniqueIdentifier>{9740b6f9-7225-41d1-892e-1a938c2134c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_light">
+      <UniqueIdentifier>{b697c134-e59f-44f0-ad5a-56024b434ed1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_light\1">
+      <UniqueIdentifier>{1d05b8a5-f42d-4bcd-b45e-4561f176e98a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_light\2">
+      <UniqueIdentifier>{579954b3-c452-450c-93bb-51621b9b4611}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_light\3">
+      <UniqueIdentifier>{a6360802-0368-4b28-975c-ab55d0cc1fdf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_PBR">
+      <UniqueIdentifier>{e5d4e6e4-d1e9-4a70-9959-d8b6bf5c349e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_PBR\1">
+      <UniqueIdentifier>{645e43a4-2408-47eb-9789-940fcbe09d48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_PBR\2">
+      <UniqueIdentifier>{e240e91e-4f66-4217-8079-54769afdd731}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_prim">
+      <UniqueIdentifier>{5df9fc21-0080-4f50-8238-7fe45078ae03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\教程">
+      <UniqueIdentifier>{1597bfc5-c685-4761-b22e-522ad33b4aa2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\2D界面">
+      <UniqueIdentifier>{56c8c618-a029-4dad-9212-2ddb9a35f8c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="资源文件\Shaders\Shader_for_2D">
+      <UniqueIdentifier>{882cc80b-8d6b-4c23-9e7d-ba5afa063db9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件\2D界面">
+      <UniqueIdentifier>{17f7053f-fd9e-460a-a1d1-9f451df838ed}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="res\GL_heads\Camera.hpp">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="res\GL_heads\glad.h">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="res\GL_heads\Mesh.hpp">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="res\GL_heads\Model.hpp">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="res\GL_heads\Shader.h">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="res\GL_heads\imgui.h">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="res\GL_heads\imgui_impl_glfw.h">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="res\GL_heads\imgui_impl_opengl3.h">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="res\GL_heads\imgui_internal.h">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="res\GL_heads\imstb_rectpack.h">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="res\GL_heads\imstb_textedit.h">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="res\GL_heads\imstb_truetype.h">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="res\GL_heads\resource.h">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClInclude>
+    <ClInclude Include="console.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="SlewingWheel.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="Conveyor.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="Berth.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="TrainLoader.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="data.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="Flow.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="Yard.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="Silo.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="SimuCore.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="Environment.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="Energy.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="Storage.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="res\GL_heads\imgui.cpp">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClCompile>
+    <ClCompile Include="res\GL_heads\imgui_demo.cpp">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClCompile>
+    <ClCompile Include="res\GL_heads\imgui_draw.cpp">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClCompile>
+    <ClCompile Include="res\GL_heads\imgui_impl_glfw.cpp">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClCompile>
+    <ClCompile Include="res\GL_heads\imgui_impl_opengl3.cpp">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClCompile>
+    <ClCompile Include="res\GL_heads\imgui_tables.cpp">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClCompile>
+    <ClCompile Include="res\GL_heads\imgui_widgets.cpp">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\visual studio\openGL\glad\src\glad.c">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClCompile>
+    <ClCompile Include="res\GL_heads\Shader.cpp">
+      <Filter>头文件\openGL_dependent</Filter>
+    </ClCompile>
+    <ClCompile Include="1_before 3d.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="2_camera.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="3_ImGui.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="4_光照初级.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="5_光照进阶.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="6_聚光高阶.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="8_Assimp.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="9_深度与模板.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="10_混合.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="11_面剔除.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="12_帧缓冲.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="13_天空盒和环境映射.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="14_高阶GLSL.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="15_几何着色器.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="15_几何着色器_爆破效果.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="16_实例化和抗锯齿.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="17_高阶光照和gamma校正.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="18_阴影映射.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="19_点阴影.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="20_法线贴图.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="21_视差贴图.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="22_HDR.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="23_泛光.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="24_延迟着色法.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="25_SSAO环境光遮蔽.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="26_PBR.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="27_Diffuse irradiance.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="28_镜面反射 IBL.cpp">
+      <Filter>源文件\教程</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="console.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="SlewingWheel.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="Conveyor.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="Berth.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="TrainLoader.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="Flow.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="Yard.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="Silo.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="SimuCore.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="Environment.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="Energy.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="Storage.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\Shaders\Shader_before_light\fragmentShader_before_light.frag">
+      <Filter>资源文件\Shaders\Shader_before_light</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_before_light\vertexShader_before_light.vert">
+      <Filter>资源文件\Shaders\Shader_before_light</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_assimp\fragmentShader_assimp.frag">
+      <Filter>资源文件\Shaders\Shader_assimp</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_assimp\lightcube_frag_assimp.frag">
+      <Filter>资源文件\Shaders\Shader_assimp</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_assimp\lightcube_vert_assimp.vert">
+      <Filter>资源文件\Shaders\Shader_assimp</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_assimp\vertexShader_assimp.vert">
+      <Filter>资源文件\Shaders\Shader_assimp</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\1\fragmentShader.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\1\lightcube.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\1\lightcube.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\1\stencil_single_color.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\1\stencil_testing.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\1\stencil_testing.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\1\vertexShader.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\2\blending.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\2\blending.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\3\framebuffers.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\3\framebuffers.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\3\framebuffers_screen.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\3\framebuffers_screen.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\4\cubemaps.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\4</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\4\cubemaps.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\4</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\4\skybox.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\4</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\4\skybox.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\4</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\5\advanced_glsl.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\5</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\5\blue.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\5</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\5\green.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\5</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\5\red.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\5</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\5\yellow.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\5</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\6\几何着色器.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\6</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\6\几何着色器.geom">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\6</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\6\几何着色器.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\6</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\7\geometry_shader.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\7</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\7\geometry_shader.geom">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\7</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\7\geometry_shader.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\7</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\8\asteroids.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\8</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\8\asteroids.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\8</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\8\planet.frag">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\8</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedOpenGL\8\planet.vert">
+      <Filter>资源文件\Shaders\Shader_advancedOpenGL\8</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\1\Blinn-Phong.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\1\Blinn-Phong.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\2\debug_quad.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\2\debug_quad.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\2\shadow_mapping.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\2\shadow_mapping.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\2\shadow_mapping_depth.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\2\shadow_mapping_depth.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\3\point_shadows.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\3\point_shadows.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\3\point_shadows_depth.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\3\point_shadows_depth.geom">
+      <Filter>资源文件\Shaders\Shader_advancedLight\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\3\point_shadows_depth.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\4\normal_mapping.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\4</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\4\normal_mapping.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\4</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\5\parallax_mapping.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\5</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\5\parallax_mapping.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\5</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\6\hdr.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\6</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\6\hdr.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\6</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\6\lighting.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\6</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\6\lighting.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\6</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\7\bloom.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\7</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\7\bloom.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\7</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\7\bloom_final.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\7</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\7\bloom_final.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\7</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\7\blur.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\7</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\7\blur.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\7</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\7\lightbox.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\7</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\8\deferred_light_box.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\8</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\8\deferred_light_box.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\8</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\8\deferred_shading.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\8</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\8\deferred_shading.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\8</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\8\g_buffer.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\8</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\8\g_buffer.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\8</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\9\ssao.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\9</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\9\ssao.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\9</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\9\ssao_blur.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\9</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\9\ssao_geometry.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\9</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\9\ssao_geometry.vert">
+      <Filter>资源文件\Shaders\Shader_advancedLight\9</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_advancedLight\9\ssao_lighting.frag">
+      <Filter>资源文件\Shaders\Shader_advancedLight\9</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_light\fragmentShader_light.frag">
+      <Filter>资源文件\Shaders\Shader_light\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_light\lightcube_frag.frag">
+      <Filter>资源文件\Shaders\Shader_light\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_light\lightcube_vert.vert">
+      <Filter>资源文件\Shaders\Shader_light\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_light\vertexShader_light.vert">
+      <Filter>资源文件\Shaders\Shader_light\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_light_adv\fragmentShader_light_adv.frag">
+      <Filter>资源文件\Shaders\Shader_light\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_light_adv\lightcube_frag_adv.frag">
+      <Filter>资源文件\Shaders\Shader_light\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_light_adv\lightcube_vert_adv.vert">
+      <Filter>资源文件\Shaders\Shader_light\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_light_adv\vertexShader_light_adv.vert">
+      <Filter>资源文件\Shaders\Shader_light\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_light_master\fragmentShader_light_master.frag">
+      <Filter>资源文件\Shaders\Shader_light\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_light_master\lightcube_frag_master.frag">
+      <Filter>资源文件\Shaders\Shader_light\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_light_master\lightcube_vert_master.vert">
+      <Filter>资源文件\Shaders\Shader_light\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_light_master\vertexShader_light_master.vert">
+      <Filter>资源文件\Shaders\Shader_light\3</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_PBR\1\pbr.frag">
+      <Filter>资源文件\Shaders\Shader_PBR\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_PBR\1\pbr.vert">
+      <Filter>资源文件\Shaders\Shader_PBR\1</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_PBR\2\background.frag">
+      <Filter>资源文件\Shaders\Shader_PBR\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_PBR\2\background.vert">
+      <Filter>资源文件\Shaders\Shader_PBR\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_PBR\2\cubemap.vert">
+      <Filter>资源文件\Shaders\Shader_PBR\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_PBR\2\equirectangular_to_cubemap.frag">
+      <Filter>资源文件\Shaders\Shader_PBR\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_PBR\2\irradiance_convolution.frag">
+      <Filter>资源文件\Shaders\Shader_PBR\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_PBR\2\pbr.frag">
+      <Filter>资源文件\Shaders\Shader_PBR\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_PBR\2\pbr.vert">
+      <Filter>资源文件\Shaders\Shader_PBR\2</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_prim\fragmentShader.frag">
+      <Filter>资源文件\Shaders\Shader_prim</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_prim\vertexShader.vert">
+      <Filter>资源文件\Shaders\Shader_prim</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_conv_2d.vert">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_conv_2d.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_wheel_2d.vert">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_wheel_2d.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_wheel_2d.geom">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_conv_2d.geom">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\cubemaps_wood.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\cubemaps.vert">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\skybox.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\skybox.vert">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\cubemaps_glass.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_unloader_2d.vert">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_unloader_2d.geom">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_unloader_2d.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_bucket_2d.vert">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_bucket_2d.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_bucket_2d.geom">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_ship_2d.vert">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_ship_2d.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_ship_2d.geom">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_building_2d.vert">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_building_2d.geom">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_building_2d.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_train_2d.vert">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_train_2d.geom">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_train_2d.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_yard_2d.vert">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_yard_2d.geom">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_yard_2d.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_silo_2d.vert">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_silo_2d.geom">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_silo_2d.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+  </ItemGroup>
+</Project>
