@@ -153,6 +153,7 @@
     <ClInclude Include="Energy.h" />
     <ClInclude Include="Environment.h" />
     <ClInclude Include="Flow.h" />
+    <ClInclude Include="Message.h" />
     <ClInclude Include="res\GL_heads\Camera.hpp" />
     <ClInclude Include="res\GL_heads\glad.h" />
     <ClInclude Include="res\GL_heads\imgui.h" />
@@ -169,8 +170,8 @@
     <ClInclude Include="Silo.h" />
     <ClInclude Include="SimuCore.h" />
     <ClInclude Include="SlewingWheel.h" />
-    <ClInclude Include="Storage.h" />
     <ClInclude Include="TrainLoader.h" />
+    <ClInclude Include="Web.h" />
     <ClInclude Include="Yard.h" />
   </ItemGroup>
   <ItemGroup>
@@ -297,6 +298,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Message.cpp" />
     <ClCompile Include="res\GL_heads\imgui.cpp" />
     <ClCompile Include="res\GL_heads\imgui_demo.cpp" />
     <ClCompile Include="res\GL_heads\imgui_draw.cpp" />
@@ -308,8 +310,8 @@
     <ClCompile Include="Silo.cpp" />
     <ClCompile Include="SimuCore.cpp" />
     <ClCompile Include="SlewingWheel.cpp" />
-    <ClCompile Include="Storage.cpp" />
     <ClCompile Include="TrainLoader.cpp" />
+    <ClCompile Include="Web.cpp" />
     <ClCompile Include="Yard.cpp" />
   </ItemGroup>
   <ItemGroup>

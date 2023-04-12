@@ -9,6 +9,7 @@
 #include "res/GL_heads/Camera.hpp"
 #include "res/GL_heads/Shader.h"
 #include "SimuCore.h"
+#include "Message.h"
 
 /*
 * 实际抓斗闲置位置在大料斗上方，即crab_bucket_hor = 1而不是-1
@@ -48,7 +49,6 @@ struct ShipUnloader
 	std::string unloader_name;		//卸船机编号
 	int unloader_index;				//卸船机序号
 	int unloader_state;				//卸船机状态，0红色未运行，1蓝色设备就绪，2绿色负载运行
-	unsigned int unloader_time;	//卸船机总计运行时间
 	float crab_bucket_hor;			//抓斗水平位置，-1.0f闲置，0.0f在船上，1.0f在皮带上
 	float crab_bucket_ver;			//抓斗垂直位置，0.0f表示降到位，1.0f表示升到位
 	bool crab_bucket_switch;		//门机抓斗位于哪条皮带，0A皮带，1B皮带
@@ -67,7 +67,6 @@ struct ShipLoader
 {
 	std::string loader_name;		//装船机编号
 	int loader_state;				//装船机状态，0红色未运行，1蓝色设备就绪，2绿色负载运行
-	unsigned int loader_time;		//装船机总计运行时间
 	int loader_pow;					//装船机运行功率
 };
 
@@ -100,30 +99,30 @@ class Berth
 {
 public:
 	Berth();
-	void reset(SimuCore& core, bool rand_init);		//重置
-	void ship_random_initiator(SimuCore& core);	//船舶随机初始化
-	int berth_finished;								//卸完结束泊位序号，-1为不结束，0到3为泊位的A皮带，4到7为泊位B皮带
-	ShipLoader loader;								//装船机属性结构体，不得将权限设置为private，否则在构造函数会引发访问冲突
+	void reset(SimuCore& core, bool rand_init);												//重置
+	void ship_random_initiator(SimuCore& core);											//船舶随机初始化
+	int berth_finished;																		//卸完结束泊位序号，-1为不结束，0到3为泊位的A皮带，4到7为泊位B皮带
+	ShipLoader loader;																		//装船机属性结构体，不得将权限设置为private，否则在构造函数会引发访问冲突
 	void drawUnloader(Camera& camera, Shader& unloaderShader, Shader& bucketShader);
 	void drawLoader(Camera& camera, Shader& loaderShader);
 	void drawShip(Camera& camera, Shader& shipShader);
-	void initGuiStyle();							//样式初始化
-	int ship_dispatch();							//船舶调度控制台，返回需要流程停止的泊位序号
-	void unloader_dispatch();					//卸船机调度台
-	void updateBuckets(float simurate);			//更新抓斗状态
-	int updateShips(float simurate);			//更新船只状态，返回1为装船装满结束
-	void add_type(std::string str_name, int type_type);				//添加货物新类
-	bool set_unloading_ship(std::vector<std::string>& equipments);		//卸船机卸船准备检查，返回false为开始失败
-	bool set_loading_ship(int load_type, int load_index);				//装船机装船准备检查，返回false为装船启动失败
-	void run_unloader_unloaded(std::vector<std::string>& equipments);	//空载运行
-	void run_unloader_loaded(std::vector<std::string>& equipments);	//负载运行
-	void unloader_shutDown(std::vector<std::string>& equipments);		//流程取消
-	int get_up_type();							//获取通用泊位货物大类
-	int get_up_index();							//获取通用泊位货物小类
-	float get_up_amount();						//获取通用泊位作业量
-	int get_down_type();						//获取4泊位货物小类
-	int get_down_index();						//获取4泊位货物小类
-	float get_down_amount();					//获取4泊位作业量
+	void initGuiStyle();																		//样式初始化
+	int ship_dispatch(Message& message);													//船舶调度控制台，返回需要流程停止的泊位序号
+	void unloader_dispatch();																//卸船机调度台
+	void updateBuckets(float simurate);														//更新抓斗状态
+	int updateShips(float simurate);														//更新船只状态，返回1为装船装满结束
+	void add_type(std::string str_name, int type_type);									//添加货物新类
+	bool set_unloading_ship(Message& message, std::vector<std::string>& equipments);		//卸船机卸船准备检查，返回false为开始失败
+	bool set_loading_ship(Message& message, int load_type, int load_index);				//装船机装船准备检查，返回false为装船启动失败
+	void run_unloader_unloaded(Message& message, std::vector<std::string>& equipments);	//空载运行
+	void run_unloader_loaded(std::vector<std::string>& equipments);						//负载运行
+	void unloader_shutDown(std::vector<std::string>& equipments);							//流程取消
+	int get_up_type();																		//获取通用泊位货物大类
+	int get_up_index();																		//获取通用泊位货物小类
+	float get_up_amount();																	//获取通用泊位作业量
+	int get_down_type();																	//获取4泊位货物小类
+	int get_down_index();																	//获取4泊位货物小类
+	float get_down_amount();																//获取4泊位作业量
 	void set_focus(std::vector<std::string>& equipments);
 	void lose_focus();
 
@@ -153,9 +152,9 @@ private:
 	glm::mat4 model;
 	glm::mat4 view;
 	glm::mat4 projection;
-	int get_ship_type(float total_storage);		//判定船舶吨位：0为5千吨，1为2万吨，2为3.5万吨，3为5万吨，4为6.5万吨
-	float get_ship_level(float total_storage);		//判定船舶吨位：0.7为5千吨，0.9为2万吨，1.1为3.5万吨，1.3为5万吨，1.5为6.5万吨
-	bool type_check(int type, int index);			//检查是否存在相应货物类的定义，返回true表示存在定义
+	int get_ship_type(float total_storage);						//判定船舶吨位：0为5千吨，1为2万吨，2为3.5万吨，3为5万吨，4为6.5万吨
+	float get_ship_level(float total_storage);						//判定船舶吨位：0.7为5千吨，0.9为2万吨，1.1为3.5万吨，1.3为5万吨，1.5为6.5万吨
+	bool type_check(int type, int index);							//检查是否存在相应货物类的定义，返回true表示存在定义
 	void bucket_unload(float simurate, ShipUnloader& unloader);	//抓斗下行过程中减少对应门机泊位船舶的当前载货量
 	void pre_button();
 	void post_button();

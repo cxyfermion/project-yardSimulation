@@ -87,11 +87,11 @@ void SimuCore::simulator_gui()
 		ImGui::SameLine();
 		//ImGui::InputFloat(u8"倍", &simu_rate);
 		ImGui::SliderFloat(u8"倍", &simu_rate, 0.1f, 80.0f);
-		if (simu_rate <= 0 || simu_rate > 10000)
+		/*if (simu_rate <= 0 || simu_rate > 10000)
 		{
 			std::cout << "速率范围不合法！速率范围为0-10000" << std::endl;
 		}
-		else if (this->run_rate != simu_rate)
+		else */if (this->run_rate != simu_rate)
 		{
 			this->run_rate = simu_rate;
 		}

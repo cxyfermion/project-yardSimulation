@@ -46,8 +46,6 @@ Yard::Yard()
 	info_type[1] = u8"大混,蒙混,大同,大精,陕煤,俄罗斯煤,俄罗斯无烟,兴煤";
 	info_type[2] = u8"新中港,神华精,伊泰,天马,特底灰,神混,神优,优一,神华,富动";
 	//数据初始化
-	this->father.yard_pow = 100;
-	this->father.yard_time = 0;
 	this->father.yard_focus = false;
 	this->father.yard_coords[2] = LAYER_YARD;
 	this->father.yard_coords[3] = 0.0f;
@@ -165,7 +163,6 @@ void Yard::reset(SimuCore& core, bool rand_init)
 	int index_temp = 0;			//临时随机生成货物小类
 	for (std::vector<Yard_father>::iterator it1 = this->yards.begin(); it1 != this->yards.end(); it1++)
 	{
-		it1->yard_time = 0;
 		for (std::vector<Yard_child>::iterator it2 = it1->children.begin(); it2 != it1->children.end(); it2++)
 		{
 			it2->child_flux_left = 0.0f;
@@ -399,7 +396,7 @@ void Yard::initGuiStyle()
 	this->style = &ImGui::GetStyle();
 }
 
-void Yard::yard_dispatch(bool unreal)
+void Yard::yard_dispatch(Message& message, bool unreal)
 {
 	if (ImGui::CollapsingHeader(u8"堆场状态显示"))
 	{
@@ -442,7 +439,7 @@ void Yard::add_type(std::string str_name, int type_type)
 	this->names.push_back(this->type_unit);
 }
 
-bool Yard::start_stack(std::vector<std::string>& equipments, int yard, int child, int type, int index, float amount, float flux)
+bool Yard::start_stack(Message& message, std::vector<std::string>& equipments, int yard, int child, int type, int index, float amount, float flux)
 {
 	//堆料设定
 	bool ret = false;
@@ -459,13 +456,15 @@ bool Yard::start_stack(std::vector<std::string>& equipments, int yard, int child
 					if (it2->child_type != 0 && (it2->child_type != type || it2->child_index != index))
 					{
 						ret = false;
-						std::cout << "堆料申请失败::货物类别冲突" << std::endl;
+						//std::cout << "堆料申请失败::货物类别冲突" << std::endl;
+						message.push_message(u8"堆料申请失败::货物类别冲突");
 						break;
 					}
 					if (it2->child_cur_amount + amount > it2->child_max_amount)
 					{
 						//ret = false;
-						std::cout << "堆料申请警告::申请堆放量超过承载上限" << std::endl;
+						//std::cout << "堆料申请警告::申请堆放量超过承载上限" << std::endl;
+						message.push_message(u8"堆料申请警告::申请堆放量超过承载上限");
 						//break;
 					}
 					//定位斗轮机
@@ -534,7 +533,8 @@ bool Yard::start_stack(std::vector<std::string>& equipments, int yard, int child
 					if (std::abs(pos_yard - pos_wheel) > 1)
 					{
 						ret = false;
-						std::cout << "堆料申请失败::选中的堆场不在斗轮机作业范围内" << std::endl;
+						//std::cout << "堆料申请失败::选中的堆场不在斗轮机作业范围内" << std::endl;
+						message.push_message(u8"堆料申请失败::选中的堆场不在斗轮机作业范围内");
 						break;
 					}
 					else if (pos_wheel == -1)
@@ -543,19 +543,22 @@ bool Yard::start_stack(std::vector<std::string>& equipments, int yard, int child
 						if (*it_wheel == "SR11" && (it1->yard_name != "G" && it1->yard_name != "H"))
 						{
 							ret = false;
-							std::cout << "堆料申请失败::选中的堆场不在斗轮机SR11作业范围内" << std::endl;
+							//std::cout << "堆料申请失败::选中的堆场不在斗轮机SR11作业范围内" << std::endl;
+							message.push_message(u8"堆料申请失败::选中的堆场不在斗轮机SR11作业范围内");
 							break;
 						}
 						else if (*it_wheel == "S12" && it1->yard_name != "K")
 						{
 							ret = false;
-							std::cout << "堆料申请失败::选中的堆场不在斗轮机S12作业范围内" << std::endl;
+							//std::cout << "堆料申请失败::选中的堆场不在斗轮机S12作业范围内" << std::endl;
+							message.push_message(u8"堆料申请失败::选中的堆场不在斗轮机S12作业范围内");
 							break;
 						}
 						else if (*it_wheel == "SR12" && it1->yard_name != "WEST2")
 						{
 							ret = false;
-							std::cout << "堆料申请失败::选中的堆场不在斗轮机SR12作业范围内" << std::endl;
+							//std::cout << "堆料申请失败::选中的堆场不在斗轮机SR12作业范围内" << std::endl;
+							message.push_message(u8"堆料申请失败::选中的堆场不在斗轮机SR12作业范围内");
 							break;
 						}
 					}
@@ -595,11 +598,12 @@ bool Yard::start_stack(std::vector<std::string>& equipments, int yard, int child
 	//if (!ret)
 	//{
 	//	std::cout << "堆料申请失败" << std::endl;
+	// 	message.push_message(u8"堆料申请失败");
 	//}
 	return ret;
 }
 
-bool Yard::start_reclaim(std::vector<std::string>& equipments, int yard, int child, int type, int index, float flux)
+bool Yard::start_reclaim(Message& message, std::vector<std::string>& equipments, int yard, int child, int type, int index, float flux)
 {
 	//取料设定
 	bool ret = false;
@@ -616,13 +620,15 @@ bool Yard::start_reclaim(std::vector<std::string>& equipments, int yard, int chi
 					if (it2->child_type == 0 || it2->child_cur_amount < 10.0f)
 					{
 						ret = false;
-						std::cout << "取料申请失败::当前堆场堆量过低或空" << std::endl;
+						//std::cout << "取料申请失败::当前堆场堆量过低或空" << std::endl;
+						 message.push_message(u8"取料申请失败::当前堆场堆量过低或空");
 						break;
 					}
 					if (it2->child_type != 0 && (it2->child_type != type || it2->child_index != index))
 					{
 						ret = false;
-						std::cout << "取料申请失败::货物类别冲突" << std::endl;
+						//std::cout << "取料申请失败::货物类别冲突" << std::endl;
+						message.push_message(u8"取料申请失败::货物类别冲突");
 						break;
 					}
 					//定位斗轮机
@@ -683,7 +689,8 @@ bool Yard::start_reclaim(std::vector<std::string>& equipments, int yard, int chi
 					if (std::abs(pos_yard - pos_wheel) > 1)
 					{
 						ret = false;
-						std::cout << "堆料申请失败::选中的堆场不在斗轮机作业范围内" << std::endl;
+						//std::cout << "堆料申请失败::选中的堆场不在斗轮机作业范围内" << std::endl;
+						message.push_message(u8"堆料申请失败::选中的堆场不在斗轮机作业范围内");
 						break;
 					}
 					else if (pos_wheel == -1)
@@ -692,19 +699,22 @@ bool Yard::start_reclaim(std::vector<std::string>& equipments, int yard, int chi
 						if (*it_wheel == "SR11" && (it1->yard_name != "G" && it1->yard_name != "H"))
 						{
 							ret = false;
-							std::cout << "堆料申请失败::选中的堆场不在斗轮机SR11作业范围内" << std::endl;
+							//std::cout << "堆料申请失败::选中的堆场不在斗轮机SR11作业范围内" << std::endl;
+							message.push_message(u8"堆料申请失败::选中的堆场不在斗轮机SR11作业范围内");
 							break;
 						}
 						else if (*it_wheel == "S12" && it1->yard_name != "K")
 						{
 							ret = false;
-							std::cout << "堆料申请失败::选中的堆场不在斗轮机S12作业范围内" << std::endl;
+							//std::cout << "堆料申请失败::选中的堆场不在斗轮机S12作业范围内" << std::endl;
+							message.push_message(u8"堆料申请失败::选中的堆场不在斗轮机S12作业范围内");
 							break;
 						}
 						else if (*it_wheel == "SR12" && it1->yard_name != "WEST2")
 						{
 							ret = false;
-							std::cout << "堆料申请失败::选中的堆场不在斗轮机SR12作业范围内" << std::endl;
+							//std::cout << "堆料申请失败::选中的堆场不在斗轮机SR12作业范围内" << std::endl;
+							message.push_message(u8"堆料申请失败::选中的堆场不在斗轮机SR12作业范围内");
 							break;
 						}
 					}
@@ -739,10 +749,11 @@ bool Yard::start_reclaim(std::vector<std::string>& equipments, int yard, int chi
 			break;
 		}
 	}
-	if (!ret)
-	{
-		std::cout << "取料申请失败" << std::endl;
-	}
+	//if (!ret)
+	//{
+	//	//std::cout << "取料申请失败" << std::endl;
+	//	message.push_message(u8"取料申请失败");
+	//}
 	return ret;
 }
 
@@ -995,7 +1006,7 @@ bool Yard::updateYards(float simurate)
 	return ret;
 }
 
-void Yard::yard_choose()
+void Yard::yard_choose(Message& message)
 {
 	if (this->yard_choosing)
 	{
@@ -1059,7 +1070,8 @@ void Yard::yard_choose()
 			}
 			else
 			{
-				std::cout << "无法选中堆场" << std::endl;
+				//std::cout << "无法选中堆场" << std::endl;
+				message.push_message(u8"无法选中堆场");
 			}
 		}
 		ImGui::SameLine();

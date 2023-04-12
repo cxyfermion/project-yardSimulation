@@ -104,7 +104,6 @@ Conveyor::Conveyor()
 	info_conv[48] = "XC2,565,1540,930,1540,355,600";
 	info_conv[49] = "ZW11,200,985,540,935,280,378";
 	info_conv[50] = "ZW12,160,970,160,2180,75,400";
-	this->conv.conv_time = 0;
 	this->conv.conv_state = 0;
 	this->conv.conv_speed = 3.15f;
 	this->conv.flow_idx = 100;
@@ -174,7 +173,6 @@ void Conveyor::reset()
 	for (std::vector<ConvAttrib>::iterator it1 = this->belts.begin(); it1 != this->belts.end(); it1++)
 	{
 		it1->conv_state = 0;
-		it1->conv_time = 0;
 		it1->conv_cur_storage = 0.0f;
 		it1->flow_idx = 100;
 		it1->flow_name = -1;

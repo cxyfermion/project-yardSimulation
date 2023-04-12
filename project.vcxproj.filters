@@ -195,7 +195,10 @@
     <ClInclude Include="Energy.h">
       <Filter>头文件\2D界面</Filter>
     </ClInclude>
-    <ClInclude Include="Storage.h">
+    <ClInclude Include="Message.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
+    <ClInclude Include="Web.h">
       <Filter>头文件\2D界面</Filter>
     </ClInclude>
   </ItemGroup>
@@ -347,7 +350,10 @@
     <ClCompile Include="Energy.cpp">
       <Filter>源文件\2D界面</Filter>
     </ClCompile>
-    <ClCompile Include="Storage.cpp">
+    <ClCompile Include="Message.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="Web.cpp">
       <Filter>源文件\2D界面</Filter>
     </ClCompile>
   </ItemGroup>

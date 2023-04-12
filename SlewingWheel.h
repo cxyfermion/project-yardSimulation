@@ -7,13 +7,15 @@
 #include "res/GL_heads/Camera.hpp"
 #include "res/GL_heads/Shader.h"
 
+/*
+斗轮机（非圆堆）800KVA，400KW
+*/
+
 struct WheelAttrib
 {
 	std::string wheel_name;		//斗轮机代号
 	int wheel_idx;				//斗轮机序号
 	int wheel_state;			//斗轮机运行状态，-1灰色系统离线（停机状态），0红色未上电或故障，1绿色运行
-	unsigned int wheel_time;	//斗轮机总计运行时间
-	int wheel_pow;				//斗轮机运行功率
 	bool wheel_mode;			//斗轮机运行模式，0堆料运行，1取料运行
 };
 

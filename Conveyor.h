@@ -27,7 +27,6 @@ struct ConvAttrib
 {
 	std::string conv_name;		//皮带代号
 	int conv_state;				//皮带运行状态，-1灰色系统离线（停机状态），0红色未上电或故障，1蓝色皮带在现场已经通电，各项保护设施已经正常，告诉中控室该皮带可以进入下步流程环节，技术术语叫做皮带待机完成，2浅绿色运行（空载），3深绿运行（负载）
-	unsigned int conv_time;	//皮带总计运行时间
 	int conv_idx;				//皮带序号
 	int conv_pow;				//皮带运行功率
 	float conv_speed;			//带速
@@ -68,23 +67,23 @@ class Conveyor
 {
 public:
 	Conveyor();
-	void reset();												//重置
-	void draw(Camera& camera, Shader& convShader, float value);
-	void initGuiStyle();											//样式初始化
-	void conv_dispatch(bool unreal);							//流程状态显示
-	void updateConvs(float simurate);							//更新皮带
-	void add_type(std::string str_name, int type_type);		//添加货物新类
-	bool startCheck(std::vector<std::string>& equipments);		//检查传入的设备代号容器是否都空闲且物料输送请求一致，返回false为禁止启动，返回true为允许启动
-	bool sceneCheck(std::vector<std::string>& equipments);		//现场检查
-	void run_unloaded(std::vector<std::string>& equipments);	//空载运行
+	void reset();																					//重置
+	void draw(Camera& camera, Shader& convShader, float value);									//绘制
+	void initGuiStyle();																				//样式初始化
+	void conv_dispatch(bool unreal);																//流程状态显示
+	void updateConvs(float simurate);																//更新皮带
+	void add_type(std::string str_name, int type_type);											//添加货物新类
+	bool startCheck(std::vector<std::string>& equipments);											//检查传入的设备代号容器是否都空闲且物料输送请求一致，返回false为禁止启动，返回true为允许启动
+	bool sceneCheck(std::vector<std::string>& equipments);											//现场检查
+	void run_unloaded(std::vector<std::string>& equipments);										//空载运行
 	bool runCheck(int type, int index, std::vector<std::string>& equipments);						//检查对应的皮带设备中是否存在冲突的货物类，返回false表示不允许启动
 	void run_loaded(int index_flow, int type, int index, std::vector<std::string>& equipments);	//负载运行
-	void shutDown(int index_flow);								//流程停止
-	void cancel(std::vector<std::string>& equipments);			//流程取消
-	bool cancelCheck(std::vector<std::string>& equipments);		//流程取消检查，返回true表示允许取消本流程
-	void emergency_shutDown(int index_flow, std::vector<std::string>& equipments);	//流程急停
-	void set_focus(std::vector<std::string>& equipments);		//选中流程的显示
-	void lose_focus();											//失焦后的流程显示
+	void shutDown(int index_flow);																	//流程停止
+	void cancel(std::vector<std::string>& equipments);												//流程取消
+	bool cancelCheck(std::vector<std::string>& equipments);											//流程取消检查，返回true表示允许取消本流程
+	void emergency_shutDown(int index_flow, std::vector<std::string>& equipments);				//流程急停
+	void set_focus(std::vector<std::string>& equipments);											//选中流程的显示
+	void lose_focus();																				//失焦后的流程显示
 
 private:
 	ImGuiStyle* style;					//ImGui样式

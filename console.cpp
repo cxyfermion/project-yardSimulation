@@ -41,10 +41,10 @@ void mouse_scroll_posotion(GLFWwindow* window, double xoffset, double yoffset)
 Console::Console()
 {
 	this->random_initiating = false;
-	this->compitence = 11;
-	std::string temp_1[12] = { u8"游客", u8"卸船机驾驶员", u8"船舶调度员", u8"火车调度员", u8"火车船舶总调度员", u8"流程管理员", u8"仿真人员", u8"堆场管理员", u8"筒仓管理员", u8"超级管理员", u8"气象员", u8"上帝" };
-	std::string temp_2[12] = { u8"仅有观光权限", u8"拥有卸船机的控制权限", u8"拥有船舶的调度权限", u8"拥有火车的调度权限", u8"拥有火车和船舶的调度权限", u8"拥有流程系统控制权限", u8"拥有仿真系统控制权限", u8"拥有堆场系统控制权限", u8"拥有筒仓系统控制权限", u8"拥有系统顶级控制权限", u8"拥有控制环境权限", u8"全知全能" };
-	for (int i = 0; i < 12; i++)
+	this->compitence = 12;
+	std::string temp_1[13] = { u8"游客", u8"卸船机驾驶员", u8"船舶调度员", u8"火车调度员", u8"火车船舶总调度员", u8"流程管理员", u8"仿真人员", u8"堆场管理员", u8"筒仓管理员", u8"变电所管理员", u8"超级管理员", u8"气象员", u8"上帝" };
+	std::string temp_2[13] = { u8"仅有观光权限", u8"拥有卸船机的控制权限", u8"拥有船舶的调度权限", u8"拥有火车的调度权限", u8"拥有火车和船舶的调度权限", u8"拥有流程系统控制权限", u8"拥有仿真系统控制权限", u8"拥有堆场系统控制权限", u8"拥有筒仓系统控制权限", u8"拥有变电站系统控制权限", u8"拥有系统顶级控制权限", u8"拥有控制环境权限", u8"全知全能" };
+	for (int i = 0; i < 13; i++)
 	{
 		this->names[i] = temp_1[i];
 		this->descriptions[i] = temp_2[i];
@@ -93,6 +93,8 @@ void Console::run()
 	Silo silo;
 	SimuCore simucore;
 	Environment env;
+	Energy energy;
+	Message message;
 
 	/*Shader*/
 	Shader convShader("res/Shaders/Shader_for_2D/shader_conv_2d.vert", "res/Shaders/Shader_for_2D/shader_conv_2d.frag", "res/Shaders/Shader_for_2D/shader_conv_2d.geom");
@@ -135,6 +137,8 @@ void Console::run()
 	yard.initGuiStyle();
 	silo.initGuiStyle();
 	simucore.initGuiStyle();
+	energy.initGuiStyle();
+	message.initGuiStyle();
 	//背景
 	env.createEnv(woodShader, glassShader, skyboxShader);
 
@@ -155,23 +159,29 @@ void Console::run()
 			if (berth.berth_finished != -1)
 			{
 				//船舶卸空结束
-				flow.end_shipunloading(berth.berth_finished, conv, wheel, berth, yard);
+				flow.end_shipunloading(message, energy, berth.berth_finished, conv, wheel, berth, yard);
 			}
 			int ret_ship = berth.updateShips(simucore.run_rate);
 			if (ret_ship == 1)
 			{
 				//装船装满结束
-				flow.end_shiploading(conv, berth);
+				flow.end_shiploading(energy, conv, berth);
 			}
 			end_train_1 = train.updateTrains(simucore.run_rate);
 			if (yard.updateYards(simucore.run_rate))
 			{
-				flow.stop_yard_flow(yard.terminate_wheel, conv, wheel, berth, train, silo);
+				flow.stop_yard_flow(energy, yard.terminate_wheel, conv, wheel, berth, train, silo);
 			}
 			silo.updateStraight(simucore.run_rate);
 			if (silo.updateSilos(simucore.run_rate))
 			{
-				flow.stop_silo_flow(conv, wheel, yard);
+				flow.stop_silo_flow(energy, conv, wheel, yard);
+			}
+			energy.update(message, simucore.run_rate, simucore.simu_deltaTime);
+			if (energy.trip != -1)
+			{
+				//变压器跳闸
+				flow.trip_end(energy.trip == 0, energy.getEquipments(), conv, wheel, berth, train, yard, silo);
 			}
 			//步进修正
 			if (simucore.stepping)
@@ -191,6 +201,8 @@ void Console::run()
 			silo.reset(simucore, simucore.reset_rand);
 			simucore.reset_rand = false;
 			simucore.reset_zero = false;
+			energy.reset();
+			message.reset();
 		}
 		//绘制图像
 		conv.draw(camera, convShader, 0.3f * std::sin((float)simucore.time * 2) + 0.7f);
@@ -210,68 +222,73 @@ void Console::run()
 		ImGui::Begin(u8"控制面板");
 		simucore.base_info();
 		this->identity_choose();
-		if (this->compitence == 6 || this->compitence == 11)
+		if (this->compitence == 6 || this->compitence == 12)
 		{
 			simucore.simulator_gui();
 		}
-		env.env_dispatch(simucore.runtime_hours, simucore.runtime_minutes, (this->compitence == 10 || this->compitence == 11), camera, woodShader, glassShader, skyboxShader);
-		if (this->compitence == 5 || this->compitence == 9 || this->compitence == 11)
+		env.env_dispatch(simucore.runtime_hours, simucore.runtime_minutes, (this->compitence == 11 || this->compitence == 12), camera, woodShader, glassShader, skyboxShader);
+		if (this->compitence == 9 || this->compitence == 10 || this->compitence == 12)
 		{
-			conv.conv_dispatch(this->compitence == 11);
-			flow.showGui(conv, wheel, berth, train, yard, silo);
+			energy.transformerDispatch();
 		}
-		if ((this->compitence > 0 && this->compitence < 5) || this->compitence == 9 || this->compitence == 11)
+		if (this->compitence == 5 || this->compitence == 10 || this->compitence == 12)
+		{
+			conv.conv_dispatch(this->compitence == 12);
+			flow.showGui(message, energy, conv, wheel, berth, train, yard, silo);
+		}
+		if ((this->compitence > 0 && this->compitence < 5) || this->compitence == 10 || this->compitence == 12)
 		{
 			if (ImGui::CollapsingHeader(u8"船舶与火车调度台"))
 			{
 				ImGui::Indent();
 				if (this->compitence != 1 && this->compitence != 3)
 				{
-					int ship_berth = berth.ship_dispatch();
+					int ship_berth = berth.ship_dispatch(message);
 					if (ship_berth != -1)
 					{
 						//船舶离港中断
-						flow.ship_leave(ship_berth, conv, wheel, yard);
+						flow.ship_leave(energy, ship_berth, conv, wheel, yard);
 					}
 				}
-				if (this->compitence == 1 || this->compitence == 9 || this->compitence == 11)
+				if (this->compitence == 1 || this->compitence == 10 || this->compitence == 12)
 				{
 					berth.unloader_dispatch();
 				}
 				if (this->compitence != 1 && this->compitence != 2)
 				{
-					end_train_2 = train.train_dispatch();
+					end_train_2 = train.train_dispatch(message);
 				}
 				ImGui::Text(" ");
 				ImGui::Unindent();
 			}
 		}
-		if ((this->compitence > 6 && this->compitence < 10) || this->compitence == 11)
+		if ((this->compitence > 6 && this->compitence < 11 && this->compitence != 9) || this->compitence == 12)
 		{
 			if (ImGui::CollapsingHeader(u8"堆场与筒仓调度台"))
 			{
 				ImGui::Indent();
-				flow.add_type(conv, wheel, berth, train, yard);
+				flow.add_type(message, conv, wheel, berth, train, yard);
 				if (this->compitence != 8)
 				{
-					yard.yard_dispatch(this->compitence == 11);
+					yard.yard_dispatch(message, this->compitence == 12);
 				}
 				if (this->compitence != 7)
 				{
-					silo.silo_dispatch(this->compitence == 11);
+					silo.silo_dispatch(this->compitence == 12);
 				}
 				ImGui::Unindent();
 			}
 		}
 		ImGui::End();
-		yard.yard_choose();
+		yard.yard_choose(message);
 		silo.show_select();
+		message.show();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		//末尾处理
 		if (end_train_1 || end_train_2)
 		{
-			flow.train_check(end_train_1, end_train_2, conv, wheel, train, yard);
+			flow.train_check(energy, end_train_1, end_train_2, conv, wheel, train, yard);
 		}
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -288,11 +305,11 @@ void Console::identity_choose()
 	if (ImGui::CollapsingHeader(u8"权限选择"))
 	{
 		ImGui::Indent();
-		static int choose = 11;
-		for (int i = 0; i < 12; i++)
+		static int choose = 12;
+		for (int i = 0; i < 13; i++)
 		{
 			ImGui::RadioButton((this->names[i]).c_str(), &choose, i);
-			if (i != 5 && i != 11)
+			if (i != 6 && i != 12)
 			{
 				ImGui::SameLine();
 			}

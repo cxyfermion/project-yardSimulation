@@ -69,7 +69,6 @@ Berth::Berth()
 	this->unloader.crab_bucket_switch = false;
 	this->unloader.crab_bucket_hor = -1.0f;
 	this->unloader.crab_bucket_ver = 1.0f;
-	this->unloader.unloader_time = 0;
 	this->unloader.unloader_state = 0;	
 	this->unloader.crab_bucket_loaded = false;
 	//抓斗数据
@@ -160,7 +159,6 @@ Berth::Berth()
 	this->loader.loader_name = "SL4";
 	this->loader.loader_state = 0;
 	this->loader.loader_pow = 37;
-	this->loader.loader_time = 0;
 	this->loader_coords[0] = 2870.0f / (CT_WIDTH / 10.0f) - 5.0f;
 	this->loader_coords[1] = -390.0f / (CT_WIDTH / 10.0f) + (CT_HEIGHT * 5.0f / CT_WIDTH);
 	this->loader_coords[2] = layer_unloader;
@@ -290,7 +288,6 @@ void Berth::reset(SimuCore& core, bool rand_init)
 		it1->crab_bucket_switch = false;
 		it1->crab_bucket_hor = -1.0f;
 		it1->crab_bucket_ver = 1.0f;
-		it1->unloader_time = 0;
 		it1->unloader_state = 0;
 		it1->crab_bucket_loaded = false;
 		this->unloader_coords[5 * it1->unloader_index + 3] = 0.0f;
@@ -305,7 +302,6 @@ void Berth::reset(SimuCore& core, bool rand_init)
 		}
 	}
 	//重置装船机
-	this->loader.loader_time = 0;
 	this->loader.loader_state = 0;
 	//重置船舶
 	this->ships.clear();
@@ -669,7 +665,7 @@ void Berth::initGuiStyle()
 	this->style = &ImGui::GetStyle();
 }
 
-int Berth::ship_dispatch()
+int Berth::ship_dispatch(Message& message)
 {
 	int ret = -1;
 	static char name[50];
@@ -732,7 +728,8 @@ int Berth::ship_dispatch()
 			if (enable && name == "")
 			{
 				enable = false;
-				std::cout << "进港申请失败::舷号为空" << std::endl;
+				//std::cout << "进港申请失败::舷号为空" << std::endl;
+				message.push_message(u8"进港申请失败::舷号为空");
 			}
 			if (enable && berthIdx == 2 || berthIdx == 3)
 			{
@@ -740,7 +737,8 @@ int Berth::ship_dispatch()
 				if (wait_pos_2 < 2050)
 				{
 					enable = false;
-					std::cout << "进港申请失败::锚地非法" << std::endl;
+					//std::cout << "进港申请失败::锚地非法" << std::endl;
+					message.push_message(u8"进港申请失败::锚地非法");
 				}
 			}
 			else
@@ -749,38 +747,45 @@ int Berth::ship_dispatch()
 				if (wait_pos_2 > 350)
 				{
 					enable = false;
-					std::cout << "进港申请失败::锚地非法" << std::endl;
+					//std::cout << "进港申请失败::锚地非法" << std::endl;
+					message.push_message(u8"进港申请失败::锚地非法");
 				}
 			}
 			if (enable && this->type_check(cargo_type, cargo_index) == false)
 			{
 				enable = false;
-				std::cout << "进港申请失败::货物种类错误" << std::endl;
+				//std::cout << "进港申请失败::货物种类错误" << std::endl;
+				message.push_message(u8"进港申请失败::货物种类错误");
 			}
 			if (enable && total_storage <= 0 || current_storage <= 0)
 			{
 				enable = false;
-				std::cout << "进港申请失败::载货量必须需为正" << std::endl;
+				//std::cout << "进港申请失败::载货量必须需为正" << std::endl;
+				message.push_message(u8"进港申请失败::载货量必须需为正");
 			}
 			if (enable && total_storage < current_storage)
 			{
 				enable = false;
-				std::cout << "进港申请失败::禁止超载" << std::endl;
+				//std::cout << "进港申请失败::禁止超载" << std::endl;
+				message.push_message(u8"进港申请失败::禁止超载");
 			}
 			if (enable && total_storage > 65000)
 			{
 				enable = false;
-				std::cout << "进港申请失败::船舶超过泊位能力上限" << std::endl;
+				//std::cout << "进港申请失败::船舶超过泊位能力上限" << std::endl;
+				message.push_message(u8"进港申请失败::船舶超过泊位能力上限");
 			}
 			if (enable && (berthIdx == 2 || berthIdx == 3) && total_storage > 20000)
 			{
 				enable = false;
-				std::cout << "进港申请失败::船舶吨位超过4泊位承载力" << std::endl;
+				//std::cout << "进港申请失败::船舶吨位超过4泊位承载力" << std::endl;
+				message.push_message(u8"进港申请失败::船舶吨位超过4泊位承载力");
 			}
 			if (enable && berthIdx == 4 && total_storage > 5000)
 			{
 				enable = false;
-				std::cout << "进港申请失败::船舶吨位超过23泊位承载力" << std::endl;
+				//std::cout << "进港申请失败::船舶吨位超过23泊位承载力" << std::endl;
+				message.push_message(u8"进港申请失败::船舶吨位超过23泊位承载力");
 			}
 			if (enable)
 			{
@@ -821,7 +826,8 @@ int Berth::ship_dispatch()
 					this->ship.ship_coords[7] = 7.0f;
 				}
 				this->ships.push_back(this->ship);
-				std::cout << "船舶进港申请成功！" << std::endl;
+				//std::cout << "船舶进港申请成功！" << std::endl;
+				message.push_message(u8"船舶进港申请成功！");
 			}
 		}
 		this->post_button();
@@ -938,7 +944,8 @@ int Berth::ship_dispatch()
 						{
 							//通用泊位被占用，驳回靠泊请求
 							enBerth = false;
-							std::cout << "靠泊申请失败::通用泊位被全部占用" << std::endl;
+							//std::cout << "靠泊申请失败::通用泊位被全部占用" << std::endl;
+							message.push_message(u8"靠泊申请失败::通用泊位被全部占用");
 						}
 						else if (ship_21 == 0 && ship_22 == 0)
 						{
@@ -952,19 +959,22 @@ int Berth::ship_dispatch()
 							{
 								//21泊位被占用
 								enBerth = false;
-								std::cout << "靠泊申请失败::21泊位被占用" << std::endl;
+								//std::cout << "靠泊申请失败::21泊位被占用" << std::endl;
+								message.push_message(u8"靠泊申请失败::21泊位被占用");
 							}
 							else if (berthIdx == 1 && ship_22 == 1)
 							{
 								//22泊位被占用
 								enBerth = false;
-								std::cout << "靠泊申请失败::22泊位被占用" << std::endl;
+								//std::cout << "靠泊申请失败::22泊位被占用" << std::endl;
+								message.push_message(u8"靠泊申请失败::22泊位被占用");
 							}
 							else if (ship_type + current_capacity > MAX_GENBERTH_CAPACITY)
 							{
 								//超过承载上限
 								enBerth = false;
-								std::cout << "靠泊申请失败::申请超过泊位靠泊能力上限" << std::endl;
+								//std::cout << "靠泊申请失败::申请超过泊位靠泊能力上限" << std::endl;
+								message.push_message(u8"靠泊申请失败::申请超过泊位靠泊能力上限");
 							}
 						}
 					}
@@ -977,7 +987,8 @@ int Berth::ship_dispatch()
 							{
 								//有船舶正在占用4泊位
 								enBerth = false;
-								std::cout << "靠泊申请失败::4泊位被占用" << std::endl;
+								//std::cout << "靠泊申请失败::4泊位被占用" << std::endl;
+								message.push_message(u8"靠泊申请失败::4泊位被占用");
 								break;
 							}
 						}
@@ -1923,7 +1934,7 @@ void Berth::add_type(std::string str_name, int type_type)
 	this->names.push_back(this->type_unit);
 }
 
-bool Berth::set_unloading_ship(std::vector<std::string>& equipments)
+bool Berth::set_unloading_ship(Message& message, std::vector<std::string>& equipments)
 {
 	bool ret = false;
 	std::vector<std::string>::const_iterator it1 = equipments.begin();
@@ -1942,12 +1953,13 @@ bool Berth::set_unloading_ship(std::vector<std::string>& equipments)
 	}
 	if (!ret)
 	{
-		std::cout << "启动流程失败::泊位没有船舶" << std::endl;
+		//std::cout << "启动流程失败::泊位没有船舶" << std::endl;
+		message.push_message(u8"启动流程失败::泊位没有船舶");
 	}
 	return ret;
 }
 
-bool Berth::set_loading_ship(int load_type, int load_index)
+bool Berth::set_loading_ship(Message& message, int load_type, int load_index)
 {
 	bool ret = true;
 	for (std::vector<Ship>::iterator it1 = this->ships.begin(); it1 != this->ships.end(); it1++)
@@ -1964,7 +1976,8 @@ bool Berth::set_loading_ship(int load_type, int load_index)
 			else
 			{
 				//请求失败
-				std::cout << "装船请求失败::货物类型不匹配" << std::endl;
+				//std::cout << "装船请求失败::货物类型不匹配" << std::endl;
+				message.push_message(u8"装船请求失败::货物类型不匹配");
 				ret = false;
 			}
 			break;
@@ -1973,7 +1986,7 @@ bool Berth::set_loading_ship(int load_type, int load_index)
 	return ret;
 }
 
-void Berth::run_unloader_unloaded(std::vector<std::string>& equipments)
+void Berth::run_unloader_unloaded(Message& message, std::vector<std::string>& equipments)
 {
 	//设置相应卸船机或装船机为蓝色
 	for (std::vector<std::string>::const_iterator it1 = equipments.begin(); it1 != equipments.end(); it1++)
@@ -2041,7 +2054,8 @@ void Berth::run_unloader_unloaded(std::vector<std::string>& equipments)
 			else
 			{
 				//无船靠泊，不允许启动
-				std::cout << "卸船机准备失败::通用泊位无船只靠泊" << std::endl;
+				//std::cout << "卸船机准备失败::通用泊位无船只靠泊" << std::endl;
+				message.push_message(u8"卸船机准备失败::通用泊位无船只靠泊");
 			}
 		}
 		else if (*it1 == "BC1A" || *it1 == "BC1B")
@@ -2108,7 +2122,8 @@ void Berth::run_unloader_unloaded(std::vector<std::string>& equipments)
 			else
 			{
 				//无船靠泊，不允许启动
-				std::cout << "卸船机准备失败::4泊位无船只靠泊" << std::endl;
+				//std::cout << "卸船机准备失败::4泊位无船只靠泊" << std::endl;
+				message.push_message(u8"卸船机准备失败::4泊位无船只靠泊");
 			}
 		}
 		else if (*it1 == "SL4")

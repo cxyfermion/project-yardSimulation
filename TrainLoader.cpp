@@ -53,11 +53,9 @@ TrainLoader::TrainLoader()
 	this->building_A.building_pow = 45;
 	this->building_A.building_state = 0;
 	this->building_A.building_mode = 2;
-	this->building_A.building_time = 0;
 	this->building_B.building_pow = 45;
 	this->building_B.building_state = 0;
 	this->building_B.building_mode = 2;
-	this->building_B.building_time = 0;
 	//A楼
 	this->building_coords_A[0] = (3630.0f + BIAS_X) / (CT_WIDTH / 10.0f) - 5.0f;
 	this->building_coords_A[1] = -1325.0f / (CT_WIDTH / 10.0f) + (CT_HEIGHT * 5.0f / CT_WIDTH);
@@ -123,8 +121,6 @@ TrainLoader::TrainLoader()
 
 void TrainLoader::reset(SimuCore& core, bool rand_init)
 {
-	this->building_A.building_time = 0;
-	this->building_B.building_time = 0;
 	this->building_A.building_state = 0;
 	this->building_B.building_state = 0;
 	this->building_coords_A[3] = 0.0f;
@@ -349,7 +345,7 @@ void TrainLoader::initGuiStyle()
 	this->style = &ImGui::GetStyle();
 }
 
-int TrainLoader::train_dispatch()
+int TrainLoader::train_dispatch(Message& message)
 {
 	int end = 0;		//流程结束信号
 	static int idx = 82001;
@@ -386,18 +382,21 @@ int TrainLoader::train_dispatch()
 				if (it->train_idx == idx)
 				{
 					enable = false;
-					std::cout << "进港申请失败::已存在相同编号的列车" << std::endl;
+					//std::cout << "进港申请失败::已存在相同编号的列车" << std::endl;
+					message.push_message(u8"进港申请失败::已存在相同编号的列车");
 				}
 				if (it->train_lane == lane)
 				{
 					enable = false;
-					std::cout << "进港申请失败::车道被占用" << std::endl;
+					//std::cout << "进港申请失败::车道被占用" << std::endl;
+					message.push_message(u8"进港申请失败::车道被占用");
 				}
 			}
 			if (enable && lane < 2 && wagon_num>24)
 			{
 				enable = false;
-				std::cout << "进港申请失败::车皮数超过车道承载上限" << std::endl;
+				//std::cout << "进港申请失败::车皮数超过车道承载上限" << std::endl;
+				message.push_message(u8"进港申请失败::车皮数超过车道承载上限");
 			}
 			if (enable)
 			{
@@ -445,7 +444,8 @@ int TrainLoader::train_dispatch()
 				this->train.train_coords[5] = 0.0f;
 				this->train.train_coords[6] = 0.0f;
 				this->trains.push_back(this->train);
-				std::cout << "火车进港申请成功！" << std::endl;
+				//std::cout << "火车进港申请成功！" << std::endl;
+				message.push_message(u8"火车进港申请成功！");
 			}
 		}
 		this->post_button();

@@ -1,5 +1,4 @@
 #include "Flow.h"
-#include <iostream>
 
 #define FLUX 0.0022f					//流程通用流量
 #define RECLAIM_SAFE_START 10.0f		//取料流程启动时堆场最低当前容量
@@ -130,7 +129,6 @@ Flow::Flow()
 	info_flow[110] = "486,SR7,BC9,BC17,BC18A,ZW11,ZW12";
 	info_flow[111] = "487,SR8,BC10,BC17,BC18A,ZW11,ZW12";
 	info_flow[112] = "488,SR9,BC11,BC18A,ZW11,ZW12";
-
 	//流程读取
 	this->flow_attr.flow_state = 0;
 	this->flow_attr.flow_time = 0;
@@ -175,7 +173,7 @@ void Flow::initGuiStyle()
 	this->style = &ImGui::GetStyle();
 }
 
-void Flow::add_type(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard)
+void Flow::add_type(Message& message, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard)
 {
 	static int type_type = 1;			//大类
 	static char str_name[50] = "";		//类名
@@ -200,7 +198,8 @@ void Flow::add_type(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoad
 			yard.add_type(str_name, type_type);
 			berth.add_type(str_name, type_type);
 			train.add_type(str_name, type_type);
-			std::cout << "新类添加成功！" << std::endl;
+			//std::cout << "新类添加成功！" << std::endl;
+			message.push_message(u8"新类添加成功！");
 		}
 		this->style->Colors[ImGuiCol_Text] = ImColor(255, 255, 255, 255);
 		this->style->Colors[ImGuiCol_Button] = ImColor(200, 200, 200, 255);
@@ -208,7 +207,7 @@ void Flow::add_type(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoad
 	}
 }
 
-void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo)
+void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo)
 {
 	if (ImGui::CollapsingHeader(u8"流程控制面板"))
 	{
@@ -246,16 +245,20 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 				{
 					//按钮变为红色
 					it->flow_state = 1;
+					//对应开关柜变为冷备状态
+					energy.coldStart(it->equipments);
 				}
 				else
 				{
 					if (it->flow_state != 0)
 					{
-						std::cout << "启动失败::流程已经运行" << std::endl;
+						//std::cout << "启动失败::流程已经运行" << std::endl;
+						message.push_message(u8"启动失败::流程已经运行");
 					}
 					else
 					{
-						std::cout << "启动失败::设备被占用" << std::endl;
+						//std::cout << "启动失败::设备被占用" << std::endl;
+						message.push_message(u8"启动失败::设备被占用");
 					}
 				}
 			}
@@ -285,11 +288,13 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 				{
 					if (it->flow_state == 1)
 					{
-						std::cout << "检查失败::流程已经运行或未激活流程" << std::endl;
+						//std::cout << "检查失败::流程已经运行或未激活流程" << std::endl;
+						message.push_message(u8"检查失败::流程已经运行或未激活流程");
 					}
 					else
 					{
-						std::cout << "检查失败::已经检查完毕" << std::endl;
+						//std::cout << "检查失败::已经检查完毕" << std::endl;
+						message.push_message(u8"检查失败::已经检查完毕");
 					}
 				}
 			}
@@ -303,18 +308,22 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 					//皮带变浅绿色
 					conv.run_unloaded(it->equipments);
 					//门机变闲置状态
-					berth.run_unloader_unloaded(it->equipments);
+					berth.run_unloader_unloaded(message, it->equipments);
+					//开关柜启动
+					energy.hotStart(it->equipments);
 					it->flow_state = 2;
 				}
 				else
 				{
 					if (it->flow_state == 1)
 					{
-						std::cout << "待机运行失败::流程已经运行或未激活流程" << std::endl;
+						//std::cout << "待机运行失败::流程已经运行或未激活流程" << std::endl;
+						message.push_message(u8"待机运行失败::流程已经运行或未激活流程");
 					}
 					else
 					{
-						std::cout << "待机运行失败::检查未就绪" << std::endl;
+						//std::cout << "待机运行失败::检查未就绪" << std::endl;
+						message.push_message(u8"待机运行失败::检查未就绪");
 					}
 				}
 			}
@@ -366,16 +375,19 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 							//数据获取失败
 							if (it->flow_idx < 62)
 							{
-								std::cout << "流程负载启动失败::通用泊位船舶未就绪" << std::endl;
+								//std::cout << "流程负载启动失败::通用泊位船舶未就绪" << std::endl;
+								message.push_message(u8"流程负载启动失败::通用泊位船舶未就绪");
 							}
 							else if ((it->flow_idx > 62 && it->flow_idx < 79) || (it->flow_idx > 86 && it->flow_idx < 91))
 							{
-								std::cout << "流程负载启动失败::4泊位船舶未就绪" << std::endl;
+								//std::cout << "流程负载启动失败::4泊位船舶未就绪" << std::endl;
+								message.push_message(u8"流程负载启动失败::4泊位船舶未就绪");
 							}
 						}
 						else if (!conv.runCheck(type, index, it->equipments))
 						{
-							std::cout << "流程负载启动失败::当前皮带中存在没有卸完且种类不匹配的货物" << std::endl;
+							//std::cout << "流程负载启动失败::当前皮带中存在没有卸完且种类不匹配的货物" << std::endl;
+							message.push_message(u8"流程负载启动失败::当前皮带中存在没有卸完且种类不匹配的货物");
 						}
 						else
 						{
@@ -388,10 +400,10 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 							else
 							{
 								//接收数据，启动流程
-								if (yard.start_stack(it->equipments, yard.yard_choosed, yard.child_choosed, type, index, amount, FLUX))
+								if (yard.start_stack(message, it->equipments, yard.yard_choosed, yard.child_choosed, type, index, amount, FLUX))
 								{
 									//当前泊位无船不允许启动流程，视为不允许空载运行
-									if (berth.set_unloading_ship(it->equipments))
+									if (berth.set_unloading_ship(message, it->equipments))
 									{
 										//斗轮机运行
 										wheel.run(it->equipments, 0);
@@ -424,17 +436,19 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 							cur_amount = yard.amount_choosed;
 							if (cur_amount < RECLAIM_SAFE_START)
 							{
-								std::cout << "流程负载启动失败::堆场当前容量不足以启动流程" << std::endl;
+								//std::cout << "流程负载启动失败::堆场当前容量不足以启动流程" << std::endl;
+								message.push_message(u8"流程负载启动失败::堆场当前容量不足以启动流程");
 								yard.send_reset();
 							}
 							else if (!conv.runCheck(type, index, it->equipments))
 							{
-								std::cout << "流程负载启动失败::当前皮带中存在没有卸完且种类不匹配的货物" << std::endl;
+								//std::cout << "流程负载启动失败::当前皮带中存在没有卸完且种类不匹配的货物" << std::endl;
+								message.push_message(u8"流程负载启动失败::当前皮带中存在没有卸完且种类不匹配的货物");
 							}
 							else
 							{
 								//取料流程启动
-								if (yard.start_reclaim(it->equipments, yard.yard_choosed, yard.child_choosed, type, index, FLUX))
+								if (yard.start_reclaim(message, it->equipments, yard.yard_choosed, yard.child_choosed, type, index, FLUX))
 								{
 									//装车楼启动
 									if (train.run(it->equipments, type, index))
@@ -448,7 +462,8 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 									else
 									{
 										it->flow_state = 2;
-										std::cout << "负载运行失败::没有可以载货的火车" << std::endl;
+										//std::cout << "负载运行失败::没有可以载货的火车" << std::endl;
+										message.push_message(u8"负载运行失败::没有可以载货的火车");
 									}
 								}
 								yard.send_reset();
@@ -473,17 +488,20 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 							artifice_cur_amount = yard.amount_choosed;
 							if (artifice_cur_amount < RECLAIM_SAFE_START)
 							{
-								std::cout << "流程负载启动失败::堆场当前容量不足以启动流程" << std::endl;
+								//std::cout << "流程负载启动失败::堆场当前容量不足以启动流程" << std::endl;
+								message.push_message(u8"流程负载启动失败::堆场当前容量不足以启动流程");
 								yard.send_reset();
 							}
 							else if (!((artifice_type == 1 && artifice_index == 9) || (artifice_type == 2 && artifice_index == 1)))
 							{
-								std::cout << "流程负载启动失败::非大混和化工煤不能输入炼化" << std::endl;
+								//std::cout << "流程负载启动失败::非大混和化工煤不能输入炼化" << std::endl;
+								message.push_message(u8"流程负载启动失败::非大混和化工煤不能输入炼化");
 								yard.send_reset();
 							}
 							else if (!conv.runCheck(artifice_type, artifice_index, it->equipments))
 							{
-								std::cout << "流程负载启动失败::当前皮带中存在没有卸完且种类不匹配的货物" << std::endl;
+								//std::cout << "流程负载启动失败::当前皮带中存在没有卸完且种类不匹配的货物" << std::endl;
+								message.push_message(u8"流程负载启动失败::当前皮带中存在没有卸完且种类不匹配的货物");
 							}
 							else
 							{
@@ -513,14 +531,15 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 										int silo_choosed = silo.selected_index;
 										if (silo_choosed == 0)
 										{
-											std::cout << "筒仓选择失败::未选中筒仓" << std::endl;
+											//std::cout << "筒仓选择失败::未选中筒仓" << std::endl;
+											message.push_message(u8"筒仓选择失败::未选中筒仓");
 											silo.send_reset();
 											yard.send_reset();
 										}
 										else
 										{
 											//启动堆场
-											if (yard.start_reclaim(it->equipments, yard.yard_choosed, yard.child_choosed, artifice_type, artifice_index, FLUX))
+											if (yard.start_reclaim(message, it->equipments, yard.yard_choosed, yard.child_choosed, artifice_type, artifice_index, FLUX))
 											{
 												//启动筒仓
 												if (silo.start_stack(silo_choosed, coal_type, silo.amount_apply, FLUX))
@@ -549,15 +568,17 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 						if (type <= 0 || index <= 0 || amount == 0.0f)
 						{
 							//数据获取失败
-							std::cout << "流程负载启动失败::通用泊位船舶未就绪" << std::endl;
+							//std::cout << "流程负载启动失败::通用泊位船舶未就绪" << std::endl;
+							message.push_message(u8"流程负载启动失败::通用泊位船舶未就绪");
 						}
 						else if (!conv.runCheck(type, index, it->equipments))
 						{
-							std::cout << "流程负载启动失败::当前皮带中存在没有卸完且种类不匹配的货物" << std::endl;
+							//std::cout << "流程负载启动失败::当前皮带中存在没有卸完且种类不匹配的货物" << std::endl;
+							message.push_message(u8"流程负载启动失败::当前皮带中存在没有卸完且种类不匹配的货物");
 						}
 						else
 						{
-							if (berth.set_loading_ship(type, index))
+							if (berth.set_loading_ship(message, type, index))
 							{
 								//皮带变深绿色
 								conv.run_loaded(stoi(it->flow_name), type, index, it->equipments);
@@ -576,14 +597,16 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 						if (!train.run(it->equipments, 2, 1))
 						{
 							it->flow_state = 2;
-							std::cout << "负载运行失败::没有可以载货的火车" << std::endl;
+							//std::cout << "负载运行失败::没有可以载货的火车" << std::endl;
+							message.push_message(u8"负载运行失败::没有可以载货的火车");
 						}
 						it->flow_state = 3;
 					}
 				}
 				else
 				{
-					std::cout << "负载运行失败::设备未就绪" << std::endl;
+					//std::cout << "负载运行失败::设备未就绪" << std::endl;
+					message.push_message(u8"负载运行失败::设备未就绪");
 				}
 			}
 			ImGui::SameLine();
@@ -605,12 +628,15 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 					yard.yard_end(it->equipments);
 					//筒仓停止
 					silo.end_silo(it->equipments);
+					//开关柜转热备
+					energy.hotEnd(it->equipments);
 					//按钮变红色
 					it->flow_state = 1;
 				}
 				else
 				{
-					std::cout << "停止失败::流程未进行" << std::endl;
+					//std::cout << "停止失败::流程未进行" << std::endl;
+					message.push_message(u8"停止失败::流程未进行");
 				}
 			}
 			ImGui::SameLine();
@@ -622,12 +648,15 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 				{
 					//皮带变红色
 					conv.cancel(it->equipments);
+					//开关柜变冷备
+					energy.coldEnd(it->equipments);
 					it->flow_state = 0;
 					it->scene_ready = false;
 				}
 				else
 				{
-					std::cout << "取消失败::流程进行中" << std::endl;
+					//std::cout << "取消失败::流程进行中" << std::endl;
+					message.push_message(u8"取消失败::流程进行中");
 				}
 			}
 			ImGui::SameLine();
@@ -648,7 +677,8 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 				}
 				else
 				{
-					std::cout << "急停失败::流程未激活" << std::endl;
+					//std::cout << "急停失败::流程未激活" << std::endl;
+					message.push_message(u8"急停失败::流程未激活");
 				}
 			}
 			//急停窗口
@@ -673,6 +703,8 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 					yard.yard_end(it->equipments);
 					//筒仓停止
 					silo.end_silo(it->equipments);
+					//开关柜急停
+					energy.emergencyEnd(it->equipments);
 					it->flow_state = 0;
 					it->scene_ready = false;
 					this->emergency_stop = false;
@@ -828,7 +860,8 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 				}
 				else
 				{
-					std::cout << "启动筒仓出煤失败::当前筒仓没有大混煤或已经有筒仓在出煤" << std::endl;
+					//std::cout << "启动筒仓出煤失败::当前筒仓没有大混煤或已经有筒仓在出煤" << std::endl;
+					message.push_message(u8"启动筒仓出煤失败::当前筒仓没有大混煤或已经有筒仓在出煤");
 				}
 			}
 			ImGui::SameLine();
@@ -842,7 +875,8 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 				}
 				else
 				{
-					std::cout << "启动筒仓出煤失败::当前筒仓没有化工煤或已经有筒仓在出煤" << std::endl;
+					//std::cout << "启动筒仓出煤失败::当前筒仓没有化工煤或已经有筒仓在出煤" << std::endl;
+					message.push_message(u8"启动筒仓出煤失败::当前筒仓没有化工煤或已经有筒仓在出煤");
 				}
 			}
 			ImGui::SameLine();
@@ -856,7 +890,8 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 				}
 				else
 				{
-					std::cout << "终止筒仓出煤失败::当前筒仓没有正在出煤" << std::endl;
+					//std::cout << "终止筒仓出煤失败::当前筒仓没有正在出煤" << std::endl;
+					message.push_message(u8"终止筒仓出煤失败::当前筒仓没有正在出煤");
 				}
 			}
 			this->style->Colors[ImGuiCol_Text] = ImColor(255, 255, 255, 255);
@@ -868,7 +903,7 @@ void Flow::showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoade
 	}
 }
 
-void Flow::train_check(int end_train_1, int end_train_2, Conveyor& conv, SlewingWheel& wheel, TrainLoader& train, Yard& yard)
+void Flow::train_check(Energy& energy, int end_train_1, int end_train_2, Conveyor& conv, SlewingWheel& wheel, TrainLoader& train, Yard& yard)
 {
 	if (end_train_1 == 1 || end_train_2 == 1)
 	{
@@ -878,13 +913,15 @@ void Flow::train_check(int end_train_1, int end_train_2, Conveyor& conv, Slewing
 			if ((it->flow_idx > 92 && it->flow_idx < 96) && it->flow_state == 3)
 			{
 				//皮带变蓝色
-				conv.sceneCheck(it->equipments);
+				conv.shutDown(stoi(it->flow_name));
 				//斗轮机变红色
 				wheel.shutDown(it->equipments);
 				//装车楼变红色
 				train.shutDown(it->equipments);
 				//堆场停止
 				yard.yard_end(it->equipments);
+				//转热备
+				energy.hotEnd(it->equipments);
 				//按钮变红色
 				it->flow_state = 1;
 			}
@@ -898,13 +935,15 @@ void Flow::train_check(int end_train_1, int end_train_2, Conveyor& conv, Slewing
 			if ((it->flow_idx > 95 && it->flow_idx < 98) && it->flow_state == 3)
 			{
 				//皮带变蓝色
-				conv.sceneCheck(it->equipments);
+				conv.shutDown(stoi(it->flow_name));
 				//斗轮机变红色
 				wheel.shutDown(it->equipments);
 				//装车楼变红色
 				train.shutDown(it->equipments);
 				//堆场停止
 				yard.yard_end(it->equipments);
+				//转热备
+				energy.hotEnd(it->equipments);
 				//按钮变红色
 				it->flow_state = 1;
 			}
@@ -912,7 +951,7 @@ void Flow::train_check(int end_train_1, int end_train_2, Conveyor& conv, Slewing
 	}
 }
 
-void Flow::stop_yard_flow(std::string name_wheel, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Silo& silo)
+void Flow::stop_yard_flow(Energy& energy, std::string name_wheel, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Silo& silo)
 {
 	for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
 	{
@@ -924,7 +963,7 @@ void Flow::stop_yard_flow(std::string name_wheel, Conveyor& conv, SlewingWheel& 
 				{
 					//终止流程
 					//皮带变蓝色
-					conv.sceneCheck(it1->equipments);
+					conv.shutDown(stoi(it1->flow_name));
 					//斗轮机变红色
 					wheel.shutDown(it1->equipments);
 					//泊位设备变红色
@@ -933,6 +972,8 @@ void Flow::stop_yard_flow(std::string name_wheel, Conveyor& conv, SlewingWheel& 
 					train.shutDown(it1->equipments);
 					//筒仓停止
 					silo.end_silo(it1->equipments);
+					//转热备
+					energy.hotEnd(it1->equipments);
 					it1->flow_state = 1;
 					break;
 				}
@@ -941,7 +982,7 @@ void Flow::stop_yard_flow(std::string name_wheel, Conveyor& conv, SlewingWheel& 
 	}
 }
 
-void Flow::stop_silo_flow(Conveyor& conv, SlewingWheel& wheel, Yard& yard)
+void Flow::stop_silo_flow(Energy& energy, Conveyor& conv, SlewingWheel& wheel, Yard& yard)
 {
 	for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
 	{
@@ -950,12 +991,14 @@ void Flow::stop_silo_flow(Conveyor& conv, SlewingWheel& wheel, Yard& yard)
 			std::vector<std::string>::reverse_iterator it2 = it1->equipments.rbegin();
 			if (*it2 == "ZW12")
 			{
-				//皮带变红色
+				//皮带变蓝色
 				conv.shutDown(stoi(it1->flow_name));
 				//斗轮机变红色
 				wheel.shutDown(it1->equipments);
 				//堆场停止
 				yard.yard_end(it1->equipments);
+				//转热备
+				energy.hotEnd(it1->equipments);
 				it1->flow_state = 1;
 				break;
 			}
@@ -963,7 +1006,7 @@ void Flow::stop_silo_flow(Conveyor& conv, SlewingWheel& wheel, Yard& yard)
 	}
 }
 
-void Flow::ship_leave(int berth_idx, Conveyor& conv, SlewingWheel& wheel, Yard& yard)
+void Flow::ship_leave(Energy& energy, int berth_idx, Conveyor& conv, SlewingWheel& wheel, Yard& yard)
 {
 	//对应泊位流程空载运行
 	switch (berth_idx)
@@ -976,11 +1019,13 @@ void Flow::ship_leave(int berth_idx, Conveyor& conv, SlewingWheel& wheel, Yard& 
 			{
 				it1->flow_state = 2;
 				//皮带变蓝色
-				conv.sceneCheck(it1->equipments);
+				conv.shutDown(stoi(it1->flow_name));
 				//斗轮机变红色
 				wheel.shutDown(it1->equipments);
 				//堆场停止
 				yard.yard_end(it1->equipments);
+				//转热备
+				energy.hotEnd(it1->equipments);
 			}
 		}
 		break;
@@ -992,11 +1037,13 @@ void Flow::ship_leave(int berth_idx, Conveyor& conv, SlewingWheel& wheel, Yard& 
 			{
 				it1->flow_state = 2;
 				//皮带变蓝色
-				conv.sceneCheck(it1->equipments);
+				conv.shutDown(stoi(it1->flow_name));
 				//斗轮机变红色
 				wheel.shutDown(it1->equipments);
 				//堆场停止
 				yard.yard_end(it1->equipments);
+				//转热备
+				energy.hotEnd(it1->equipments);
 			}
 		}
 		break;
@@ -1008,11 +1055,13 @@ void Flow::ship_leave(int berth_idx, Conveyor& conv, SlewingWheel& wheel, Yard& 
 			{
 				it1->flow_state = 2;
 				//皮带变蓝色
-				conv.sceneCheck(it1->equipments);
+				conv.shutDown(stoi(it1->flow_name));
 				//斗轮机变红色
 				wheel.shutDown(it1->equipments);
 				//堆场停止
 				yard.yard_end(it1->equipments);
+				//转热备
+				energy.hotEnd(it1->equipments);
 			}
 		}
 		break;
@@ -1024,11 +1073,13 @@ void Flow::ship_leave(int berth_idx, Conveyor& conv, SlewingWheel& wheel, Yard& 
 			{
 				it1->flow_state = 2;
 				//皮带变蓝色
-				conv.sceneCheck(it1->equipments);
+				conv.shutDown(stoi(it1->flow_name));
 				//斗轮机变红色
 				wheel.shutDown(it1->equipments);
 				//堆场停止
 				yard.yard_end(it1->equipments);
+				//转热备
+				energy.hotEnd(it1->equipments);
 			}
 		}
 		break;
@@ -1040,7 +1091,9 @@ void Flow::ship_leave(int berth_idx, Conveyor& conv, SlewingWheel& wheel, Yard& 
 			{
 				it1->flow_state = 2;
 				//皮带变蓝色
-				conv.sceneCheck(it1->equipments);
+				conv.shutDown(stoi(it1->flow_name));
+				//转热备
+				energy.hotEnd(it1->equipments);
 			}
 		}
 		break;
@@ -1049,7 +1102,7 @@ void Flow::ship_leave(int berth_idx, Conveyor& conv, SlewingWheel& wheel, Yard& 
 	}
 }
 
-void Flow::end_shiploading(Conveyor& conv, Berth& berth)
+void Flow::end_shiploading(Energy& energy, Conveyor& conv, Berth& berth)
 {
 	for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
 	{
@@ -1060,12 +1113,14 @@ void Flow::end_shiploading(Conveyor& conv, Berth& berth)
 			conv.run_unloaded(it1->equipments);
 			//泊位设备变红色
 			berth.unloader_shutDown(it1->equipments);
+			//转热备
+			energy.hotEnd(it1->equipments);
 			break;
 		}
 	}
 }
 
-void Flow::end_shipunloading(int berth_finished, Conveyor& conv, SlewingWheel& wheel, Berth& berth, Yard& yard)
+void Flow::end_shipunloading(Message& message, Energy& energy, int berth_finished, Conveyor& conv, SlewingWheel& wheel, Berth& berth, Yard& yard)
 {
 	if (berth_finished < 4)
 	{
@@ -1081,7 +1136,9 @@ void Flow::end_shipunloading(int berth_finished, Conveyor& conv, SlewingWheel& w
 				//堆场停止
 				yard.yard_end(it1->equipments);
 				//泊位变闲置
-				berth.run_unloader_unloaded(it1->equipments);
+				berth.run_unloader_unloaded(message, it1->equipments);
+				//转热备
+				energy.hotEnd(it1->equipments);
 				it1->flow_state = 2;
 				break;
 			}
@@ -1101,9 +1158,72 @@ void Flow::end_shipunloading(int berth_finished, Conveyor& conv, SlewingWheel& w
 				//堆场停止
 				yard.yard_end(it1->equipments);
 				//泊位变闲置
-				berth.run_unloader_unloaded(it1->equipments);
+				berth.run_unloader_unloaded(message, it1->equipments);
+				//转热备
+				energy.hotEnd(it1->equipments);
 				it1->flow_state = 2;
 				break;
+			}
+		}
+	}
+}
+
+void Flow::trip_end(bool all, std::vector<std::string> equipments, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo)
+{
+	if (all)
+	{
+		//大停电
+		for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
+		{
+			if (it1->flow_state >= 2)
+			{
+				//皮带变红色
+				conv.emergency_shutDown(stoi(it1->flow_name), it1->equipments);
+				//斗轮机变红色
+				wheel.shutDown(it1->equipments);
+				//泊位设备变红色
+				berth.unloader_shutDown(it1->equipments);
+				//装车楼变红色
+				train.shutDown(it1->equipments);
+				//堆场停止
+				yard.yard_end(it1->equipments);
+				//筒仓停止
+				silo.end_silo(it1->equipments);
+				it1->flow_state = 0;
+				it1->scene_ready = false;
+			}
+		}
+	}
+	else
+	{
+		for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
+		{
+			if (it1->flow_state >= 2)
+			{
+				for (std::vector<std::string>::iterator it2 = equipments.begin(); it2 != equipments.end(); it2++)
+				{
+					for (std::vector<std::string>::iterator it3 = it1->equipments.begin(); it3 != it1->equipments.end(); it3++)
+					{
+						if (*it2 == *it3)
+						{
+							//皮带变红色
+							conv.emergency_shutDown(stoi(it1->flow_name), it1->equipments);
+							//斗轮机变红色
+							wheel.shutDown(it1->equipments);
+							//泊位设备变红色
+							berth.unloader_shutDown(it1->equipments);
+							//装车楼变红色
+							train.shutDown(it1->equipments);
+							//堆场停止
+							yard.yard_end(it1->equipments);
+							//筒仓停止
+							silo.end_silo(it1->equipments);
+							it1->flow_state = 0;
+							it1->scene_ready = false;
+							break;
+						}
+					}
+				}
 			}
 		}
 	}

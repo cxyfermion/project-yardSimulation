@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -12,6 +13,7 @@
 #include "Yard.h"
 #include "Silo.h"
 #include "SimuCore.h"
+#include "Energy.h"
 
 struct FlowAttrib
 {
@@ -93,14 +95,15 @@ public:
 	void reset();						//重置
 	bool window_confirm;				//流程负载启动确认窗口
 	void initGuiStyle();					//样式初始化
-	void add_type(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard);									//添加货物种类
-	void showGui(Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo);						//展示流程按钮
-	void train_check(int end_train_1, int end_train_2, Conveyor& conv, SlewingWheel& wheel, TrainLoader& train, Yard& yard);			//火车卸货中止检查
-	void stop_yard_flow(std::string name_wheel, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Silo& silo);	//堆场取料用尽触发的流程停止
-	void stop_silo_flow(Conveyor& conv, SlewingWheel& wheel, Yard& yard);																//筒仓堆满或达标停机
-	void ship_leave(int berth_idx, Conveyor& conv, SlewingWheel& wheel, Yard& yard);													//船舶突然离泊触发的流程空载运行
-	void end_shiploading(Conveyor& conv, Berth& berth);																				//装船结束
-	void end_shipunloading(int berth_finished, Conveyor& conv, SlewingWheel& wheel, Berth& berth, Yard& yard);						//卸船结束
+	void add_type(Message& message, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard);												//添加货物种类
+	void showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo);					//展示流程按钮
+	void train_check(Energy& energy, int end_train_1, int end_train_2, Conveyor& conv, SlewingWheel& wheel, TrainLoader& train, Yard& yard);						//火车卸货中止检查
+	void stop_yard_flow(Energy& energy, std::string name_wheel, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Silo& silo);					//堆场取料用尽触发的流程停止
+	void stop_silo_flow(Energy& energy, Conveyor& conv, SlewingWheel& wheel, Yard& yard);																				//筒仓堆满或达标停机
+	void ship_leave(Energy& energy, int berth_idx, Conveyor& conv, SlewingWheel& wheel, Yard& yard);																	//船舶突然离泊触发的流程空载运行
+	void end_shiploading(Energy& energy, Conveyor& conv, Berth& berth);																								//装船结束
+	void end_shipunloading(Message& message, Energy& energy, int berth_finished, Conveyor& conv, SlewingWheel& wheel, Berth& berth, Yard& yard);					//卸船结束
+	void trip_end(bool all, std::vector<std::string> equipments, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo);		//变压器跳闸，第一个参数为true表示主变跳闸
 
 private:
 	ImGuiStyle* style;					//ImGui样式存储

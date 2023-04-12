@@ -36,9 +36,9 @@ public:
 	bool reset_rand;								//重置——随机，若两个随机都被激活，优先进行随机重置
 	int runtime_minutes;							//仿真运行时间-分
 	int runtime_hours;								//仿真运行时间-时
+	double simu_deltaTime;
 
 private:
-	double simu_deltaTime;
 	double simu_lastFrame;
 	double terminate_time;							//程序终结时间
 	double terminate_countdown;					//程序终结倒计时
@@ -47,7 +47,7 @@ private:
 	std::default_random_engine generator;			//随机数生成器
 	ImGuiStyle* style;								//ImGui样式
 	void fresh_time();								//计算当前仿真时间
-	void pre_button(bool choosed);					//堆场选择按钮样式设置
+	void pre_button(bool choosed);					//按钮样式设置
 	void post_button();
 
 };

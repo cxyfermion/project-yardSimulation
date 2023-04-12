@@ -8,6 +8,7 @@
 #include "res/GL_heads/Camera.hpp"
 #include "res/GL_heads/Shader.h"
 #include "SimuCore.h"
+#include "Message.h"
 
 /*
 * ImGui要点注意：相邻两个button组件的名称参数要不一样，否则若相邻按钮的名称一样，只能触发第一个按钮
@@ -44,7 +45,6 @@ struct Type_train
 struct BuildingAttrib
 {
 	int building_state;				//装车楼运行状态，-1灰色系统离线（停机状态），0红色未上电或故障，1绿色运行
-	unsigned int building_time;	//装车楼总计运行时间
 	int building_pow;				//装车楼运行功率
 	int building_mode;				//装车模式切换，0先进先出FIFO，1后进先出LIFO，2左（16和18道），3右（15和17道）
 };
@@ -75,13 +75,13 @@ class TrainLoader
 {
 public:
 	TrainLoader();
-	void reset(SimuCore& core, bool rand_init);		//重置
-	void train_random_initiator(SimuCore& core);	//火车随机初始化
+	void reset(SimuCore& core, bool rand_init);								//重置
+	void train_random_initiator(SimuCore& core);							//火车随机初始化
 	void drawBuilding(Camera& camera, Shader& buildingShader);
 	void drawTrain(Camera& camera, Shader& trainShader);
-	void initGuiStyle();							//样式初始化
-	int train_dispatch();						//ImGui火车调度控制台
-	int updateTrains(float simurate);			//火车状态
+	void initGuiStyle();														//样式初始化
+	int train_dispatch(Message& message);									//ImGui火车调度控制台
+	int updateTrains(float simurate);										//火车状态
 	void add_type(std::string str_name, int type_type);					//添加货物新类
 	bool run(std::vector<std::string>& equipments, int type, int index);	//负载运行，返回true操作成功（双道都有车优先装早进港等待的车），返回false车道上没有车，无法启动
 	void shutDown(std::vector<std::string>& equipments);					//流程停止
