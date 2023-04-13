@@ -25,7 +25,7 @@ Energy::Energy()
 	//info_transformer[6] = "6#,SCB10-1000/10,1000";
 	//info_transformer[7] = "8#,SCB10-800/10,800";
 	//开关柜数据：从属变压器，型号，变比，设备，功率
-	std::string info_gear[151];
+	std::string info_gear[153];
 	info_gear[0] = "center,KYN-28,4,BC1A,185";
 	info_gear[1] = "center,XGN15-12,10,BC2A,450";
 	info_gear[2] = "center,XGN15-12,4,BC4A,200";
@@ -99,87 +99,90 @@ Energy::Energy()
 	info_gear[69] = "1#,KYN-28,20,@2#进线,0";
 	info_gear[70] = "2#,KYN-28,6,BC14,280";
 	info_gear[71] = "2#,KYN-28,6,BC15,250";
-	info_gear[72] = "2#,KYN-28,15,@1#进线,0";
-	info_gear[73] = "2#,KYN-28,@PT,@PT避雷,0";
-	info_gear[74] = "2#,KYN-28,6,@本所变压器,0";
-	info_gear[75] = "2#,KYN-28,6,@备用,0";
-	info_gear[76] = "2#,KYN-28,15,@分段联络,0";
-	info_gear[77] = "2#,KYN-28,8,@备用,0";
-	info_gear[78] = "2#,KYN-28,6,@本所变压器,0";
-	info_gear[79] = "2#,KYN-28,@PT,@PT避雷,0";
-	info_gear[80] = "2#,KYN-28,15,@2#进线,0";
-	info_gear[81] = "3#,KYN-28,6,BC22A,250";
-	info_gear[82] = "3#,KYN-28,6,BC22A,250";
-	info_gear[83] = "3#,KYN-28,6,BC25A,250";
-	info_gear[84] = "3#,KYN-28,6,BC25A,250";
-	info_gear[85] = "3#,KYN-28,6,BC26,200";
-	info_gear[86] = "3#,KYN-28,8,BC31,355";
-	info_gear[87] = "3#,KYN-28,6,BC32,250";
-	info_gear[88] = "3#,KYN-28,6,BC33,185";
-	info_gear[89] = "3#,KYN-28,6,BC22B,250";
-	info_gear[90] = "3#,KYN-28,6,BC22B,250";
-	info_gear[91] = "3#,KYN-28,8,BC23A,355";
-	info_gear[92] = "3#,KYN-28,8,BC23B,355";
-	info_gear[93] = "3#,KYN-28,8,BC24A,355";
-	info_gear[94] = "3#,KYN-28,8,BC24B,355";
-	info_gear[95] = "3#,KYN-28,6,BC25B,250";
-	info_gear[96] = "3#,KYN-28,6,BC25B,250";
-	info_gear[97] = "3#,KYN-28,6,BC30A,185";
-	info_gear[98] = "3#,KYN-28,8,SR11,800";
-	info_gear[99] = "3#,KYN-28,6,BC30B,200";
-	info_gear[100] = "3#,KYN-28,6,BC36,200";
-	info_gear[101] = "3#,KYN-28,8,BC34,315";
+	info_gear[72] = "2#,KYN-28,80,building_A,400";
+	info_gear[73] = "2#,KYN-28,80,building_B,400";
+
+	info_gear[74] = "2#,KYN-28,15,@1#进线,0";
+	info_gear[75] = "2#,KYN-28,@PT,@PT避雷,0";
+	info_gear[76] = "2#,KYN-28,6,@本所变压器,0";
+	info_gear[77] = "2#,KYN-28,6,@备用,0";
+	info_gear[78] = "2#,KYN-28,15,@分段联络,0";
+	info_gear[79] = "2#,KYN-28,8,@备用,0";
+	info_gear[80] = "2#,KYN-28,6,@本所变压器,0";
+	info_gear[81] = "2#,KYN-28,@PT,@PT避雷,0";
+	info_gear[82] = "2#,KYN-28,15,@2#进线,0";
+	info_gear[83] = "3#,KYN-28,6,BC22A,250";
+	info_gear[84] = "3#,KYN-28,6,BC22A,250";
+	info_gear[85] = "3#,KYN-28,6,BC25A,250";
+	info_gear[86] = "3#,KYN-28,6,BC25A,250";
+	info_gear[87] = "3#,KYN-28,6,BC26,200";
+	info_gear[88] = "3#,KYN-28,8,BC31,355";
+	info_gear[89] = "3#,KYN-28,6,BC32,250";
+	info_gear[90] = "3#,KYN-28,6,BC33,185";
+	info_gear[91] = "3#,KYN-28,6,BC22B,250";
+	info_gear[92] = "3#,KYN-28,6,BC22B,250";
+	info_gear[93] = "3#,KYN-28,8,BC23A,355";
+	info_gear[94] = "3#,KYN-28,8,BC23B,355";
+	info_gear[95] = "3#,KYN-28,8,BC24A,355";
+	info_gear[96] = "3#,KYN-28,8,BC24B,355";
+	info_gear[97] = "3#,KYN-28,6,BC25B,250";
+	info_gear[98] = "3#,KYN-28,6,BC25B,250";
+	info_gear[99] = "3#,KYN-28,6,BC30A,185";
+	info_gear[100] = "3#,KYN-28,8,SR11,800";
+	info_gear[101] = "3#,KYN-28,6,BC30B,200";
+	info_gear[102] = "3#,KYN-28,6,BC36,200";
+	info_gear[103] = "3#,KYN-28,8,BC34,315";
 	//YD为低压电机，变比80
-	info_gear[102] = "3#,KYN-28,80,YD1,75";
-	info_gear[103] = "3#,KYN-28,80,YD2,75";
-	info_gear[104] = "3#,KYN-28,120,@1#进线,0";
-	info_gear[105] = "3#,KYN-28,@PT,@PT避雷,0";
-	info_gear[106] = "3#,KYN-28,15,@变压器1,0";
-	info_gear[107] = "3#,KYN-28,15,@1段无功补偿,0";
-	info_gear[108] = "3#,KYN-28,80,@4#分变,0";
-	info_gear[109] = "3#,KYN-28,6,@备用,0";
-	info_gear[110] = "3#,KYN-28,120,@分段联络,0";
-	info_gear[111] = "3#,KYN-28,15,@备用,0";
-	info_gear[112] = "3#,KYN-28,15,@8#分变,0";
-	info_gear[113] = "3#,KYN-28,@12KV,@所用变,0";
-	info_gear[114] = "3#,KYN-28,8,@4#分变,0";
-	info_gear[115] = "3#,KYN-28,15,@2段无功补偿,0";
-	info_gear[116] = "3#,KYN-28,@PT,@PT避雷,0";
-	info_gear[117] = "3#,KYN-28,120,@2#进线,0";
-	info_gear[118] = "4#,KYN-28,30,4#,1915";
-	info_gear[119] = "4#,KYN-28,30,3#,1915";
-	info_gear[120] = "4#,KYN-28,6,BC21A,200";
-	info_gear[121] = "4#,KYN-28,6,BC21B,200";
-	info_gear[122] = "4#,KYN-28,6,BC35,220";
-	info_gear[123] = "4#,KYN-28,8,loader,334";
-	info_gear[124] = "4#,KYN-28,8,BC20A,355";
-	info_gear[125] = "4#,KYN-28,8,BC20B,355";
-	info_gear[126] = "4#,KYN-28,30,2#,1915";
-	info_gear[127] = "4#,KYN-28,30,1#,1915";
-	info_gear[128] = "4#,KYN-28,80,@1#进线,0";
-	info_gear[129] = "4#,KYN-28,@PT,@PT避雷,0";
-	info_gear[130] = "4#,KYN-28,8,@变压器,0";
-	info_gear[131] = "4#,KYN-28,6,@备用,0";
-	info_gear[132] = "4#,KYN-28,80,@分段联络,0";
-	info_gear[133] = "4#,KYN-28,8,@变压器,0";
-	info_gear[134] = "4#,KYN-28,30,@备用,0";
-	info_gear[135] = "4#,KYN-28,@PT,@PT避雷,0";
-	info_gear[136] = "4#,KYN-28,80,@2#进线,0";
-	info_gear[137] = "5#,JGN15-12,15,@环网柜,0";
-	info_gear[138] = "5#,JGN15-12,15,@环网柜,0";
-	info_gear[139] = "6#,KYN-28,10,SR12,280";
-	info_gear[140] = "6#,KYN-28,15,S12,420";
-	info_gear[141] = "6#,KYN-28,50,XC1,110";
-	info_gear[142] = "6#,KYN-28,50,XC2,355";
+	info_gear[104] = "3#,KYN-28,80,YD1,75";
+	info_gear[105] = "3#,KYN-28,80,YD2,75";
+	info_gear[106] = "3#,KYN-28,120,@1#进线,0";
+	info_gear[107] = "3#,KYN-28,@PT,@PT避雷,0";
+	info_gear[108] = "3#,KYN-28,15,@变压器1,0";
+	info_gear[109] = "3#,KYN-28,15,@1段无功补偿,0";
+	info_gear[110] = "3#,KYN-28,80,@4#分变,0";
+	info_gear[111] = "3#,KYN-28,6,@备用,0";
+	info_gear[112] = "3#,KYN-28,120,@分段联络,0";
+	info_gear[113] = "3#,KYN-28,15,@备用,0";
+	info_gear[114] = "3#,KYN-28,15,@8#分变,0";
+	info_gear[115] = "3#,KYN-28,@12KV,@所用变,0";
+	info_gear[116] = "3#,KYN-28,8,@4#分变,0";
+	info_gear[117] = "3#,KYN-28,15,@2段无功补偿,0";
+	info_gear[118] = "3#,KYN-28,@PT,@PT避雷,0";
+	info_gear[119] = "3#,KYN-28,120,@2#进线,0";
+	info_gear[120] = "4#,KYN-28,30,4#,1915";
+	info_gear[121] = "4#,KYN-28,30,3#,1915";
+	info_gear[122] = "4#,KYN-28,6,BC21A,200";
+	info_gear[123] = "4#,KYN-28,6,BC21B,200";
+	info_gear[124] = "4#,KYN-28,6,BC35,220";
+	info_gear[125] = "4#,KYN-28,8,loader,334";
+	info_gear[126] = "4#,KYN-28,8,BC20A,355";
+	info_gear[127] = "4#,KYN-28,8,BC20B,355";
+	info_gear[128] = "4#,KYN-28,30,2#,1915";
+	info_gear[129] = "4#,KYN-28,30,1#,1915";
+	info_gear[130] = "4#,KYN-28,80,@1#进线,0";
+	info_gear[131] = "4#,KYN-28,@PT,@PT避雷,0";
+	info_gear[132] = "4#,KYN-28,8,@变压器,0";
+	info_gear[133] = "4#,KYN-28,6,@备用,0";
+	info_gear[134] = "4#,KYN-28,80,@分段联络,0";
+	info_gear[135] = "4#,KYN-28,8,@变压器,0";
+	info_gear[136] = "4#,KYN-28,30,@备用,0";
+	info_gear[137] = "4#,KYN-28,@PT,@PT避雷,0";
+	info_gear[138] = "4#,KYN-28,80,@2#进线,0";
+	info_gear[139] = "5#,JGN15-12,15,@环网柜,0";
+	info_gear[140] = "5#,JGN15-12,15,@环网柜,0";
+	info_gear[141] = "6#,KYN-28,10,SR12,280";
+	info_gear[142] = "6#,KYN-28,15,S12,420";
+	info_gear[143] = "6#,KYN-28,50,XC1,110";
+	info_gear[144] = "6#,KYN-28,50,XC2,355";
 	//ZW皮带属于炼化，在本系统中划入管理
-	info_gear[143] = "6#,KYN-28,6,ZW11,280";
-	info_gear[144] = "6#,KYN-28,6,ZW12,75";
-	info_gear[145] = "6#,KYN-28,30,@进线柜,0";
-	info_gear[146] = "6#,KYN-28,@PT,@PT避雷,0";
-	info_gear[147] = "6#,KYN-28,15,@变压器,0";
-	info_gear[148] = "6#,KYN-28,10,@备用,0";
-	info_gear[149] = "6#,KYN-28,4,@备用,0";
-	info_gear[150] = "6#,KYN-28,4,@备用,0";
+	info_gear[145] = "6#,KYN-28,6,ZW11,280";
+	info_gear[146] = "6#,KYN-28,6,ZW12,75";
+	info_gear[147] = "6#,KYN-28,30,@进线柜,0";
+	info_gear[148] = "6#,KYN-28,@PT,@PT避雷,0";
+	info_gear[149] = "6#,KYN-28,15,@变压器,0";
+	info_gear[150] = "6#,KYN-28,10,@备用,0";
+	info_gear[151] = "6#,KYN-28,4,@备用,0";
+	info_gear[152] = "6#,KYN-28,4,@备用,0";
 	//变压器数据读取
 	int last_pos_1 = 0;
 	int last_pos_2 = 0;
@@ -205,7 +208,7 @@ Energy::Energy()
 		this->gear.state = 0;
 		this->gear.time = 0;
 		this->gear.pow_rate = 1.0f;
-		while (index_gear <= 150 && info_gear[index_gear].substr(0, info_gear[index_gear].find(',', 0)) == this->transformer.transformer_name)
+		while (index_gear <= 152 && info_gear[index_gear].substr(0, info_gear[index_gear].find(',', 0)) == this->transformer.transformer_name)
 		{
 			last_pos_2 = 0;
 			this->gear.gear_transformer = info_gear[index_gear].substr(0, info_gear[index_gear].find(',', 0));
@@ -739,6 +742,14 @@ void Energy::transformerDispatch()
 						if (it2->equipment == "loader")
 						{
 							ImGui::Text(u8"控制的设备：装船机");
+						}
+						if (it2->equipment == "building_A")
+						{
+							ImGui::Text(u8"控制的设备：装车楼2");
+						}
+						if (it2->equipment == "building_B")
+						{
+							ImGui::Text(u8"控制的设备：装车楼1");
 						}
 						else if (it2->equipment[1] == '#' || it2->equipment[2] == '#')
 						{

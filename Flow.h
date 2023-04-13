@@ -95,7 +95,7 @@ public:
 	void reset();						//重置
 	bool window_confirm;				//流程负载启动确认窗口
 	void initGuiStyle();					//样式初始化
-	void add_type(Message& message, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard);												//添加货物种类
+	void add_type(Message& message, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Web& web);												//添加货物种类
 	void showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo);					//展示流程按钮
 	void train_check(Energy& energy, int end_train_1, int end_train_2, Conveyor& conv, SlewingWheel& wheel, TrainLoader& train, Yard& yard);						//火车卸货中止检查
 	void stop_yard_flow(Energy& energy, std::string name_wheel, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Silo& silo);					//堆场取料用尽触发的流程停止

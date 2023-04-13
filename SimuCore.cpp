@@ -135,6 +135,7 @@ void SimuCore::base_info()
 		ImGui::SameLine();
 	}
 	ImGui::Text((std::to_string(this->runtime_seconds) + u8" 秒").c_str());
+	ImGui::Text(u8"移动：W A S D；视角：MOUSE2；退出：ESC；控制台（未实装）：~");
 }
 
 void SimuCore::updateTime()

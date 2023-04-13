@@ -95,6 +95,7 @@ void Console::run()
 	Environment env;
 	Energy energy;
 	Message message;
+	Web web;
 
 	/*Shader*/
 	Shader convShader("res/Shaders/Shader_for_2D/shader_conv_2d.vert", "res/Shaders/Shader_for_2D/shader_conv_2d.frag", "res/Shaders/Shader_for_2D/shader_conv_2d.geom");
@@ -139,6 +140,7 @@ void Console::run()
 	simucore.initGuiStyle();
 	energy.initGuiStyle();
 	message.initGuiStyle();
+	web.initGuiStyle();
 	//背景
 	env.createEnv(woodShader, glassShader, skyboxShader);
 
@@ -177,6 +179,7 @@ void Console::run()
 			{
 				flow.stop_silo_flow(energy, conv, wheel, yard);
 			}
+			web.update();
 			energy.update(message, simucore.run_rate, simucore.simu_deltaTime);
 			if (energy.trip != -1)
 			{
@@ -203,6 +206,7 @@ void Console::run()
 			simucore.reset_zero = false;
 			energy.reset();
 			message.reset();
+			web.reset();
 		}
 		//绘制图像
 		conv.draw(camera, convShader, 0.3f * std::sin((float)simucore.time * 2) + 0.7f);
@@ -233,6 +237,7 @@ void Console::run()
 		}
 		if (this->compitence == 5 || this->compitence == 10 || this->compitence == 12)
 		{
+			web.web_dispatch(this->compitence == 12);
 			conv.conv_dispatch(this->compitence == 12);
 			flow.showGui(message, energy, conv, wheel, berth, train, yard, silo);
 		}
@@ -267,7 +272,7 @@ void Console::run()
 			if (ImGui::CollapsingHeader(u8"堆场与筒仓调度台"))
 			{
 				ImGui::Indent();
-				flow.add_type(message, conv, wheel, berth, train, yard);
+				flow.add_type(message, conv, wheel, berth, train, yard, web);
 				if (this->compitence != 8)
 				{
 					yard.yard_dispatch(message, this->compitence == 12);
