@@ -179,7 +179,7 @@ void Console::run()
 			{
 				flow.stop_silo_flow(energy, conv, wheel, yard);
 			}
-			web.update();
+			web.update(simucore, simucore.run_rate);
 			energy.update(message, simucore.run_rate, simucore.simu_deltaTime);
 			if (energy.trip != -1)
 			{
@@ -237,9 +237,9 @@ void Console::run()
 		}
 		if (this->compitence == 5 || this->compitence == 10 || this->compitence == 12)
 		{
-			web.web_dispatch(this->compitence == 12);
+			web.web_dispatch(this->compitence == 12, this->compitence == 10 || this->compitence == 12);
 			conv.conv_dispatch(this->compitence == 12);
-			flow.showGui(message, energy, conv, wheel, berth, train, yard, silo);
+			flow.showGui(message, energy, conv, wheel, berth, train, yard, silo, web);
 		}
 		if ((this->compitence > 0 && this->compitence < 5) || this->compitence == 10 || this->compitence == 12)
 		{
@@ -285,6 +285,7 @@ void Console::run()
 			}
 		}
 		ImGui::End();
+		flow.show_ground();
 		yard.yard_choose(message);
 		silo.show_select();
 		message.show();

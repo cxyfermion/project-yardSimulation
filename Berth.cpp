@@ -23,6 +23,10 @@ Berth::Berth()
 {
 	this->berth_finished = -1;
 	this->unload_mode_gen = false;
+	this->webUnloaders[0] = 0;
+	this->webUnloaders[1] = 0;
+	this->webUnloaders[2] = 0;
+	this->webUnloaders[3] = 0;
 	//初始化名称容器
 	std::string info_type[3];
 	info_type[0] = u8"碎石,水渣,工业盐,纸浆,黄砂,铜矿,石油焦,焦煤,化工煤,混煤,优混,无烟煤,沥青";
@@ -2138,6 +2142,10 @@ void Berth::run_unloader_unloaded(Message& message, std::vector<std::string>& eq
 void Berth::run_unloader_loaded(std::vector<std::string>& equipments)
 {
 	//设置相应卸船机为绿色
+	this->webUnloaders[0] = 0;
+	this->webUnloaders[1] = 0;
+	this->webUnloaders[2] = 0;
+	this->webUnloaders[3] = 0;
 	for (std::vector<std::string>::const_iterator it1 = equipments.begin(); it1 != equipments.end(); it1++)
 	{
 		if (*it1 == "BC20A" || *it1 == "BC20B")
@@ -2150,6 +2158,7 @@ void Berth::run_unloader_loaded(std::vector<std::string>& equipments)
 				{
 					it2->unloader_state = 2;
 					this->unloader_coords[5 * it2->unloader_index + 3] = 2.0f;
+					this->webUnloaders[it2->unloader_index] = 1;
 				}
 			}
 		}
@@ -2164,6 +2173,7 @@ void Berth::run_unloader_loaded(std::vector<std::string>& equipments)
 					{
 						it2->unloader_state = 2;
 						this->unloader_coords[5 * it2->unloader_index + 3] = 2.0f;
+						this->webUnloaders[it2->unloader_index] = 1;
 					}
 				}
 			}

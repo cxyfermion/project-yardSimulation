@@ -47,7 +47,7 @@ struct Type_ship
 struct ShipUnloader
 {
 	std::string unloader_name;		//卸船机编号
-	int unloader_index;				//卸船机序号
+	int unloader_index;				//卸船机序号：0-7
 	int unloader_state;				//卸船机状态，0红色未运行，1蓝色设备就绪，2绿色负载运行
 	float crab_bucket_hor;			//抓斗水平位置，-1.0f闲置，0.0f在船上，1.0f在皮带上
 	float crab_bucket_ver;			//抓斗垂直位置，0.0f表示降到位，1.0f表示升到位
@@ -102,6 +102,7 @@ public:
 	void reset(SimuCore& core, bool rand_init);												//重置
 	void ship_random_initiator(SimuCore& core);											//船舶随机初始化
 	int berth_finished;																		//卸完结束泊位序号，-1为不结束，0到3为泊位的A皮带，4到7为泊位B皮带
+	bool webUnloaders[4];																	//卸船机是否可用（针对物流网）
 	ShipLoader loader;																		//装船机属性结构体，不得将权限设置为private，否则在构造函数会引发访问冲突
 	void drawUnloader(Camera& camera, Shader& unloaderShader, Shader& bucketShader);
 	void drawLoader(Camera& camera, Shader& loaderShader);

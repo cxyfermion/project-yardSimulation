@@ -15,6 +15,13 @@
 #include "SimuCore.h"
 #include "Energy.h"
 
+struct Type_flow
+{
+	int type_index;			//货物小类编号，具体到货物的名称，从1开始计数
+	int type_type;			//货物大类编号，1为大类命名，2为来源命名，3为企业命名
+	std::string type_name;	//堆货名称
+};
+
 struct FlowAttrib
 {
 	std::string flow_name;					//流程代号
@@ -95,8 +102,9 @@ public:
 	void reset();						//重置
 	bool window_confirm;				//流程负载启动确认窗口
 	void initGuiStyle();					//样式初始化
-	void add_type(Message& message, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Web& web);												//添加货物种类
-	void showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo);					//展示流程按钮
+	void show_ground();					//显示地坑种类选择界面
+	void add_type(Message& message, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Web& web);									//添加货物种类
+	void showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web);			//展示流程按钮
 	void train_check(Energy& energy, int end_train_1, int end_train_2, Conveyor& conv, SlewingWheel& wheel, TrainLoader& train, Yard& yard);						//火车卸货中止检查
 	void stop_yard_flow(Energy& energy, std::string name_wheel, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Silo& silo);					//堆场取料用尽触发的流程停止
 	void stop_silo_flow(Energy& energy, Conveyor& conv, SlewingWheel& wheel, Yard& yard);																				//筒仓堆满或达标停机
@@ -107,8 +115,14 @@ public:
 
 private:
 	ImGuiStyle* style;					//ImGui样式存储
+	Type_flow type_unit;				//货物单元，包含货物种类序号及其名称
+	std::vector<Type_flow> names;		//货物种类编号与名称存储容器
 	FlowAttrib flow_attr;				//流程
 	std::vector<FlowAttrib> flows;		//流程状态存储容器
+	bool windowGroundChoose;			//地坑装车种类选择窗口
+	bool groundSelected;				//地坑装车已选定
+	int chooseType;						//地坑选定大类
+	int chooseIndex;					//地坑选定小类
 	int onfocus;							//当前焦点流程
 	bool emergency_stop;				//流程急停窗口
 	void setText(bool temp);			//设置按钮字体颜色

@@ -8,6 +8,35 @@ Flow::Flow()
 	this->window_confirm = false;
 	this->onfocus = -1;
 	this->emergency_stop = false;
+	this->windowGroundChoose = false;
+	this->groundSelected = false;
+	this->chooseType = 1;
+	this->chooseIndex = 1;
+	//初始化种类数据
+	std::string info_type[3];
+	info_type[0] = u8"碎石,水渣,工业盐,纸浆,黄砂,铜矿,石油焦,焦煤,化工煤,混煤,优混,无烟煤,沥青";
+	info_type[1] = u8"大混,蒙混,大同,大精,陕煤,俄罗斯煤,俄罗斯无烟,兴煤";
+	info_type[2] = u8"新中港,神华精,伊泰,天马,特底灰,神混,神优,优一,神华,富动";
+	int last_pos = 0;
+	int index_child = 1;
+	for (int i = 0; i < 3; i++)
+	{
+		int last_idx = (int)(info_type[i].rfind(',', info_type[i].size()));
+		last_pos = 0;
+		index_child = 1;
+		this->type_unit.type_type = i + 1;
+		while (last_pos != last_idx + 1)
+		{
+			this->type_unit.type_name = info_type[i].substr(last_pos, info_type[i].find(',', last_pos) - last_pos);
+			last_pos = (int)(info_type[i].find(',', last_pos)) + 1;
+			this->type_unit.type_index = index_child;
+			index_child++;
+			this->names.push_back(this->type_unit);
+		}
+		this->type_unit.type_name = info_type[i].substr(last_pos, info_type[i].find(',', last_pos) - last_pos);
+		this->type_unit.type_index = index_child;
+		this->names.push_back(this->type_unit);
+	}
 	std::string info_flow[113];
 	//21号泊位流程，上4号泊位堆场
 	info_flow[0] = "2101,BC20A,BC21A,BC22A,BC23A,BC24A,BC25A,YD1,BC2A,BC3A,BC4B,BC5,BC8,SR6";
@@ -118,23 +147,21 @@ Flow::Flow()
 	info_flow[99] = "472,SR7,BC9,BC17,BC18B,炼化";
 	info_flow[100] = "473,SR8,BC10,BC17,BC18B,炼化";
 	info_flow[101] = "474,SR9,BC11,BC18B,炼化";
-	info_flow[102] = "475,SR6,BC8,BC17,BC18B,ZW11,ZW12";
-	info_flow[103] = "476,SR7,BC9,BC17,BC18B,ZW11,ZW12";
-	info_flow[104] = "477,SR8,BC10,BC17,BC18B,ZW11,ZW12";
-	info_flow[105] = "478,SR9,BC11,BC18B,ZW11,ZW12";
-	info_flow[106] = "481,SR10,BC12,BC18A,ZW11,ZW12";
-	info_flow[107] = "482,SR10,BC12,BC18B,ZW11,ZW12";
+	info_flow[102] = "475,SR6,BC8,BC17,BC18B,ZW11,ZW12,silo";
+	info_flow[103] = "476,SR7,BC9,BC17,BC18B,ZW11,ZW12,silo";
+	info_flow[104] = "477,SR8,BC10,BC17,BC18B,ZW11,ZW12,silo";
+	info_flow[105] = "478,SR9,BC11,BC18B,ZW11,ZW12,silo";
+	info_flow[106] = "481,SR10,BC12,BC18A,ZW11,ZW12,silo";
+	info_flow[107] = "482,SR10,BC12,BC18B,ZW11,ZW12,silo";
 	info_flow[108] = "483,SR10,BC12,BC18B,炼化";
-	info_flow[109] = "485,SR6,BC8,BC17,BC18A,ZW11,ZW12";
-	info_flow[110] = "486,SR7,BC9,BC17,BC18A,ZW11,ZW12";
-	info_flow[111] = "487,SR8,BC10,BC17,BC18A,ZW11,ZW12";
-	info_flow[112] = "488,SR9,BC11,BC18A,ZW11,ZW12";
+	info_flow[109] = "485,SR6,BC8,BC17,BC18A,ZW11,ZW12,silo";
+	info_flow[110] = "486,SR7,BC9,BC17,BC18A,ZW11,ZW12,silo";
+	info_flow[111] = "487,SR8,BC10,BC17,BC18A,ZW11,ZW12,silo";
+	info_flow[112] = "488,SR9,BC11,BC18A,ZW11,ZW12,silo";
 	//流程读取
 	this->flow_attr.flow_state = 0;
 	this->flow_attr.flow_time = 0;
 	this->flow_attr.scene_ready = false;
-	//逗号索引
-	int last_pos = 0;
 	//临时流程代号存储
 	std::string name;
 	for (int i = 0; i < 113; i++)
@@ -173,6 +200,49 @@ void Flow::initGuiStyle()
 	this->style = &ImGui::GetStyle();
 }
 
+void Flow::show_ground()
+{
+	if (this->windowGroundChoose)
+	{
+		ImGui::Begin(u8"地坑货物种类选择");
+		ImGui::Text(u8"选择货物大类：");
+		ImGui::SameLine();
+		ImGui::RadioButton(u8"大类散货", &this->chooseType, 1);
+		ImGui::SameLine();
+		ImGui::RadioButton(u8"来源散货", &this->chooseType, 2);
+		ImGui::SameLine();
+		ImGui::RadioButton(u8"企业散货", &this->chooseType, 3);
+		ImGui::Text(u8"选择货物小类：");
+		int temp_1 = 1;
+		for (std::vector<Type_flow>::const_iterator it = this->names.begin(); it != this->names.end(); it++)
+		{
+			if (it->type_type == this->chooseType)
+			{
+				ImGui::SameLine();
+				ImGui::RadioButton(it->type_name.c_str(), &this->chooseIndex, temp_1);
+				temp_1++;
+			}
+		}
+		this->style->Colors[ImGuiCol_Text] = ImColor(0, 0, 0, 255);
+		this->style->Colors[ImGuiCol_Button] = ImColor(0, 250, 0, 255);
+		if (ImGui::Button(u8"确定"))
+		{
+			this->windowGroundChoose = false;
+			this->groundSelected = true;
+		}
+		this->style->Colors[ImGuiCol_Button] = ImColor(250, 0, 0, 255);
+		ImGui::SameLine();
+		if (ImGui::Button(u8"取消"))
+		{
+			this->windowGroundChoose = false;
+			this->groundSelected = false;
+		}
+		this->style->Colors[ImGuiCol_Text] = ImColor(255, 255, 255, 255);
+		this->style->Colors[ImGuiCol_Button] = ImColor(200, 200, 200, 255);
+		ImGui::End();
+	}
+}
+
 void Flow::add_type(Message& message, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Web& web)
 {
 	static int type_type = 1;			//大类
@@ -194,6 +264,20 @@ void Flow::add_type(Message& message, Conveyor& conv, SlewingWheel& wheel, Berth
 		this->style->Colors[ImGuiCol_Button] = ImColor(200, 200, 200, 255);
 		if (ImGui::Button(u8"添加"))
 		{
+			//自身添加
+			int lst_idx = 1;
+			for (std::vector<Type_flow>::const_iterator it = this->names.begin(); it != this->names.end(); it++)
+			{
+				if (it->type_type == type_type && it->type_index > lst_idx)
+				{
+					lst_idx = it->type_index;
+				}
+			}
+			this->type_unit.type_index = ++lst_idx;
+			this->type_unit.type_type = type_type;
+			this->type_unit.type_name = str_name;
+			this->names.push_back(this->type_unit);
+			//其他添加
 			conv.add_type(str_name, type_type);
 			yard.add_type(str_name, type_type);
 			berth.add_type(str_name, type_type);
@@ -208,7 +292,7 @@ void Flow::add_type(Message& message, Conveyor& conv, SlewingWheel& wheel, Berth
 	}
 }
 
-void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo)
+void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web)
 {
 	if (ImGui::CollapsingHeader(u8"流程控制面板"))
 	{
@@ -412,6 +496,9 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 										conv.run_loaded(stoi(it->flow_name), type, index, it->equipments);
 										//泊位设备变绿色
 										berth.run_unloader_loaded(it->equipments);
+										//物流网启动
+										bool temp[4] = { berth.webUnloaders[0],berth.webUnloaders[1],berth.webUnloaders[2],berth.webUnloaders[3] };
+										web.begin_flow(it->equipments, type, index, FLUX, temp);
 										it->flow_state = 3;
 									}
 								}
@@ -458,6 +545,9 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 										wheel.run(it->equipments, 1);
 										//皮带变深绿色
 										conv.run_loaded(stoi(it->flow_name), type, index, it->equipments);
+										//物流网启动
+										bool temp[4] = { 0,0,0,0 };
+										web.begin_flow(it->equipments, type, index, FLUX, temp);
 										it->flow_state = 3;
 									}
 									else
@@ -549,6 +639,9 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 													wheel.run(it->equipments, 1);
 													//皮带变深绿色
 													conv.run_loaded(stoi(it->flow_name), artifice_type, artifice_index, it->equipments);
+													//物流网启动
+													bool temp[4] = { 0,0,0,0 };
+													web.begin_flow(it->equipments, artifice_type, artifice_index, FLUX, temp);
 													it->flow_state = 3;
 												}
 											}
@@ -585,6 +678,9 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 								conv.run_loaded(stoi(it->flow_name), type, index, it->equipments);
 								//泊位设备变绿色
 								berth.run_unloader_loaded(it->equipments);
+								//物流网启动
+								bool temp[4] = { 0,0,0,0 };
+								web.begin_flow(it->equipments, type, index, FLUX, temp);
 								it->flow_state = 3;
 							}
 						}
@@ -592,16 +688,29 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 					else if (it->flow_idx == 97)
 					{
 						//地坑=>火车
-						//皮带变深绿色
-						conv.run_loaded(stoi(it->flow_name), 2, 1, it->equipments);
-						//装车楼变绿色（临时指定车装仅大混）
-						if (!train.run(it->equipments, 2, 1))
+						if (!this->groundSelected && !this->windowGroundChoose)
 						{
-							it->flow_state = 2;
-							//std::cout << "负载运行失败::没有可以载货的火车" << std::endl;
-							message.push_message(u8"负载运行失败::没有可以载货的火车");
+							this->windowGroundChoose = true;
 						}
-						it->flow_state = 3;
+						else if (this->groundSelected && !this->windowGroundChoose)
+						{
+							//皮带变深绿色
+							conv.run_loaded(stoi(it->flow_name), chooseType, chooseIndex, it->equipments);
+							it->flow_state = 3;
+							//装车楼变绿色
+							if (!train.run(it->equipments, chooseType, chooseIndex))
+							{
+								it->flow_state = 2;
+								//std::cout << "负载运行失败::没有可以载货的火车" << std::endl;
+								message.push_message(u8"负载运行失败::没有可以载货的火车");
+							}
+							//物流网启动
+							if (it->flow_state == 3)
+							{
+								bool temp[4] = { 0,0,0,0 };
+								web.begin_flow(it->equipments, chooseType, chooseIndex, FLUX, temp);
+							}
+						}
 					}
 				}
 				else
@@ -617,6 +726,8 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 			{
 				if (temp)
 				{
+					this->windowGroundChoose = false;
+					this->groundSelected = false;
 					//皮带变蓝色
 					conv.shutDown(stoi(it->flow_name));
 					//斗轮机变红色
@@ -631,6 +742,8 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 					silo.end_silo(it->equipments);
 					//开关柜转热备
 					energy.hotEnd(it->equipments);
+					//物流网终止
+					web.end_flow(it->equipments);
 					//按钮变红色
 					it->flow_state = 1;
 				}
@@ -641,7 +754,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 				}
 			}
 			ImGui::SameLine();
-			temp = it->flow_state == 1 && conv.cancelCheck(it->equipments);
+			temp = it->flow_state == 1 && conv.cancelCheck(it->equipments) && web.cancelCheck(it->equipments);
 			this->setText(temp);
 			if (ImGui::Button(u8"流程取消"))//仅在state=1且对应皮带状态全部变成蓝色时有效
 			{
@@ -692,6 +805,8 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 				this->style->Colors[ImGuiCol_Text] = ImColor(0, 0, 0, 255);
 				if (ImGui::Button(u8"确认"))
 				{
+					this->windowGroundChoose = false;
+					this->groundSelected = false;
 					//皮带变红色
 					conv.emergency_shutDown(stoi(it->flow_name), it->equipments);
 					//斗轮机变红色
@@ -706,6 +821,8 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 					silo.end_silo(it->equipments);
 					//开关柜急停
 					energy.emergencyEnd(it->equipments);
+					//物流网急停
+					web.emergencyShutDown(it->equipments);
 					it->flow_state = 0;
 					it->scene_ready = false;
 					this->emergency_stop = false;

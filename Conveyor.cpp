@@ -316,7 +316,7 @@ void Conveyor::conv_dispatch(bool unreal)
 				//强制指定皮带属性
 				if (it1->conv_idx == conv_select && unreal)
 				{
-					ImGui::Text(u8"堆场货物大类：");
+					ImGui::Text(u8"皮带货物大类：");
 					ImGui::SameLine();
 					ImGui::RadioButton(u8"大类散货", &type, 1);
 					ImGui::SameLine();
