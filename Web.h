@@ -3,6 +3,8 @@
 #include <vector>
 #include <algorithm>
 #include <imgui.h>
+#include "res/GL_heads/Camera.hpp"
+#include "res/GL_heads/Shader.h"
 #include "SimuCore.h"
 
 /*
@@ -10,6 +12,8 @@
 斗轮机->皮带->装车楼
 斗轮机->皮带->筒仓（直出）
 堆场和船舶在此系统中被省去
+
+从煤炭片段的容量计算到皮带的容量时，视为煤炭片段是均匀的，即每段皮带距离上的煤炭量相同。
 
 */
 
@@ -28,7 +32,7 @@ struct Fragment
 	std::string to;						//终止设备名
 	float total_length;					//皮带在当前流程起源到终止设备的总长度，在当前片段创建时计算
 	float begin;							//开头位置，在整条流程结尾时减少整个片段的煤量，开头永久向前推进
-	float end;							//末尾位置，在整条流程为脱钩（即当前源头位置不中断供给）情况下末尾位置固定于源头位置重合
+	float end;							//末尾位置，在整条流程为未脱钩（即当前源头位置不中断供给）情况下末尾位置固定于源头位置重合
 	bool disconnected;					//脱钩标志，刚开启（状态false）一个煤炭片段为源头从无输出切换为有输出的瞬间；脱钩瞬间（状态改为true）为源头从有输出切换为无输出的瞬间
 	float amount;						//载货量，在每个时间片都计算增加量或减少量：当当前片段的begin与本流程末尾位置重合，根据皮带带速减少本段量；当当前片段end位置与开头位置重合，以由上级决定的输出效率增加量（可以添加随机数扰动）
 	int cargo_type;						//货物大类，0表示未定义
@@ -42,6 +46,12 @@ struct PrePos
 	bool act;							//此节点是否与当前节点有物理连接
 };
 
+//皮带节点中的煤炭片段
+struct FragChild
+{
+	float fragCoords[7];				//片段数据VBO：x1,y1,x2,y2,z,type,focus
+};
+
 //物流网节点
 struct Node
 {
@@ -53,6 +63,9 @@ struct Node
 	int convLength;						//本节点（若是皮带）的长度
 	float convSpeed;					//本节点（若是皮带）的带速
 	float convPos;						//本节点（若是皮带）在当前流程中的累计长度位置，在当前流程被设定时计算，长度标记位置为本皮带的末尾处
+	float convCoords[6];					//本节点（若是皮带）坐标：x1,y1,x2,y2,z,focus
+	int convCode;						//皮带序号，从0开始
+	std::vector<FragChild> frags;		//本节点（若是皮带）子片段存储容器
 	bool wheelMode;						//本节点（若是斗轮机）的运行模式，0为堆料，1为取料
 	bool out;							//本节点（若是流起源节点）的输出状态，0为没有在输出，1为有在输出
 	float out_flux;						//本节点（若是流起源节点或取料模式斗轮机）的输出流量
@@ -76,7 +89,8 @@ public:
 	Web();
 	void reset();
 	void initGuiStyle();
-	void update(SimuCore& simucore, float simurate);
+	void drawFrags(Camera& camera, Shader& fragsShader);
+	void update(SimuCore& simucore, float gapTime, float simurate);
 	void add_type(std::string str_name, int type_type);
 	void web_dispatch(bool unreal, bool authorised);																//第一个参数为true表示可以强制指定存量、物料种类；第二个参数为true表示有权限控制源节点的输入开启与否
 	void start_input(std::string from_name, int type, int index, float flux);										//启动源节点输入（脱机控制）（不会改变连接逻辑，所以建议此功能在启动流程又取消后使用）
@@ -85,6 +99,10 @@ public:
 	void end_flow(std::vector<std::string>& equipments);															//流程结束记录
 	void emergencyShutDown(std::vector<std::string>& equipments);													//流程紧急停机
 	bool cancelCheck(std::vector<std::string>& equipments);															//流程取消检查，返回true表示允许取消本流程
+	void set_focus(std::vector<std::string>& equipments);
+	void lose_focus();
+	float convAmount[51];			//皮带当前载货量
+	std::string finishEndName;		//流程结束后终结流程的末尾去向设备名
 
 private:
 	ImGuiStyle* style;
@@ -93,8 +111,13 @@ private:
 	Fragment fragment;						//煤炭片段
 	std::vector<Fragment> fragments;		//煤炭片段群
 	PrePos prepos;							//前后节点结构体
+	FragChild frag_child;					//子煤炭片段
 	Node node;								//节点
 	std::vector<Node> nodes;				//物流网
+	unsigned int fragVBO, fragVAO;
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 projection;
 	void pre_button(bool choosed);
 	void post_button();
 

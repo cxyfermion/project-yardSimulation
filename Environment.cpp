@@ -275,6 +275,30 @@ void Environment::processInput(Camera& camera, GLFWwindow* window)
 	{
 		camera.ProcessKayboard(DOWN, deltaTime);
 	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	{
+		camera.ProcessView(true);
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	{
+		camera.ProcessView(false);
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+	{
+		camera.shiftMode = 1.0f;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+	{
+		camera.shiftMode = 3.0f;
+	}
+	else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
+	{
+		camera.shiftMode = 0.1f;
+	}
+	else
+	{
+		camera.shiftMode = 1.0f;
+	}
 }
 
 void Environment::drawEnv(int hour, int minute, Camera& camera, Shader& woodShader, Shader& glassShader, Shader& skyboxShader, 

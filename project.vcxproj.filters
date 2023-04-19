@@ -201,6 +201,9 @@
     <ClInclude Include="Web.h">
       <Filter>头文件\2D界面</Filter>
     </ClInclude>
+    <ClInclude Include="Record.h">
+      <Filter>头文件\2D界面</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="res\GL_heads\imgui.cpp">
@@ -354,6 +357,9 @@
       <Filter>源文件\2D界面</Filter>
     </ClCompile>
     <ClCompile Include="Web.cpp">
+      <Filter>源文件\2D界面</Filter>
+    </ClCompile>
+    <ClCompile Include="Record.cpp">
       <Filter>源文件\2D界面</Filter>
     </ClCompile>
   </ItemGroup>
@@ -755,6 +761,16 @@
       <Filter>资源文件\Shaders\Shader_for_2D</Filter>
     </None>
     <None Include="res\Shaders\Shader_for_2D\shader_silo_2d.frag">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="packages.config" />
+    <None Include="res\Shaders\Shader_for_2D\shader_frags_2d.vert">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_frags_2d.geom">
+      <Filter>资源文件\Shaders\Shader_for_2D</Filter>
+    </None>
+    <None Include="res\Shaders\Shader_for_2D\shader_frags_2d.frag">
       <Filter>资源文件\Shaders\Shader_for_2D</Filter>
     </None>
   </ItemGroup>

@@ -1,10 +1,17 @@
 #include "Web.h"
 
-#define SPEEDLAG 0.0001f
+#define CT_WIDTH 4100
+#define CT_HEIGHT 2370
+#define SCR_WIDTH 1440
+#define SCR_HEIGHT 810
+
+#define layer_belts -0.0001f	//皮带图层
+#define SPEEDLAG 1.0f
 #define UNIT_AMOUNT 0.220f	//每米皮带装载煤炭重量（吨）
 
 Web::Web()
 {
+	this->finishEndName = "NULL";
 	//初始化名称容器
 	std::string info_type[3];
 	info_type[0] = u8"碎石,水渣,工业盐,纸浆,黄砂,铜矿,石油焦,焦煤,化工煤,混煤,优混,无烟煤,沥青";
@@ -31,7 +38,8 @@ Web::Web()
 		this->names.push_back(this->type_unit);
 	}
 	//上级的开始和结束处用.分隔，其中成员用,分隔
-	//节点名称,种类编号.（如果是皮带3：皮带长度,皮带带速（0表示3.15，1表示3.5））前一级(n).后一级(n).
+	//节点名称,种类编号.（如果是皮带3：皮带长度,x1,y1,x2,y2,皮带带速（0表示3.15，1表示3.5））前一级(n).后一级(n).
+	//这里的皮带坐标数据x1到y2是从来源方向指向前往方向的。只有BC3是双向皮带
 	std::string info_nodes[74];
 	info_nodes[0] = "1#,1..BC20A,BC20B.";
 	info_nodes[1] = "2#,1..BC20A,BC20B.";
@@ -55,57 +63,57 @@ Web::Web()
 	info_nodes[19] = "building_B,7.BC15..";		//B楼即装车楼1
 	info_nodes[20] = "炼化,8.BC18B..";			//炼化直出
 	info_nodes[21] = "DS3,9..BC19.";			//来自3泊位
-	info_nodes[22] = "BC1A,2.380,0.11#,12#,13#,14#.BC2A,BC2B.";
-	info_nodes[23] = "BC1B,2.380,0.11#,12#,13#,14#.BC2A,BC2B.";
-	info_nodes[24] = "BC2A,2.1192,0.YD1,YD2,BC1A,BC1B,BC19.BC3A.";
-	info_nodes[25] = "BC2B,2.1192,0.YD1,YD2,BC1A,BC1B,BC19.BC3B.";
-	info_nodes[26] = "BC3A,2.45,0.BC2A.BC4A,BC4B,BC10,BC6A.";
-	info_nodes[27] = "BC3B,2.45,0.BC2B.BC4A,BC4B,BC10,BC6B.";
-	info_nodes[28] = "BC4A,2.205,0.BC3A,BC3B.BC5,BC9.";
-	info_nodes[29] = "BC4B,2.205,0.BC3A,BC3B.BC5,BC9.";
-	info_nodes[30] = "BC5,2.280,0.BC4A,BC4B.BC8.";
-	info_nodes[31] = "BC6A,2.230,1.BC3A,BC3B,BC26.BC7,BC11.";
-	info_nodes[32] = "BC6B,2.230,1.BC3B,BC26.BC7A,BC7,BC11.";
-	info_nodes[33] = "BC7,2.235,1.BC6A,BC6B.BC12.";
-	info_nodes[34] = "BC8,2.1230,1.BC5,SR6.SR6,BC13,BC17.";
-	info_nodes[35] = "BC9,2.1380,1.BC4A,BC4B,SR7.SR7,BC13,BC17.";
-	info_nodes[36] = "BC10,2.1380,1.BC3A,BC3B,SR8.SR8,BC13,BC17.";
-	info_nodes[37] = "BC11,2.1380,1.BC6A,BC6B,SR9.SR9,BC18A,BC18B.";
-	info_nodes[38] = "BC12,2.1390,1.BC7,SR10.SR10,BC18A,BC18B.";
-	info_nodes[39] = "BC13,2.665,0.BC8,BC9,BC10.BC14.";
-	info_nodes[40] = "BC14,2.610,0.BC13.BC15.";
-	info_nodes[41] = "BC15,2.485,0.BC14.building_B.";
-	info_nodes[42] = "BC17,2.665,0.BC8,BC9,BC10.BC18A,BC18B.";
-	info_nodes[43] = "BC18A,2.458,0.BC11,BC12,BC17.ZW11.";
-	info_nodes[44] = "BC18B,2.490,0.BC11,BC12,BC17.ZW11,炼化.";
-	info_nodes[45] = "BC19,2.320,0.DS3.BC2A,BC2B.";
-	info_nodes[46] = "BC20A,2.914,0.1#,2#,3#,4#.BC21A.";
-	info_nodes[47] = "BC20B,2.945,0.1#,2#,3#,4#.BC21B.";
-	info_nodes[48] = "BC21A,2.265,0.BC20A.BC22A.";
-	info_nodes[49] = "BC21B,2.265,0.BC20B.BC22B.";
-	info_nodes[50] = "BC22A,2.1416,0.BC21A.BC23A,BC23B.";
-	info_nodes[51] = "BC22B,2.1410,0.BC21B.BC23A,BC23B.";
-	info_nodes[52] = "BC23A,2.646,0.BC22A,BC22B.BC24A.";
-	info_nodes[53] = "BC23B,2.635,0.BC22A,BC22B.BC24B,BC30A,BC30B.";
-	info_nodes[54] = "BC24A,2.965,0.BC23A.BC25A.";
-	info_nodes[55] = "BC24B,2.970,0.BC23B.BC25B.";
-	info_nodes[56] = "BC25A,2.696,0.BC24A.YD1.";
-	info_nodes[57] = "BC25B,2.696,0.BC24B.YD2.";
-	info_nodes[58] = "BC26,2.395,0.YD1,YD2.BC6A,BC6B.";
-	info_nodes[59] = "BC30A,2.235,0.BC23A,BC23B.BC31.";
-	info_nodes[60] = "BC30B,2.436,0.BC23B.BC36.";
-	info_nodes[61] = "BC31,2.645,0.BC30A,SR11.SR11,BC32.";
-	info_nodes[62] = "BC32,2.155,0.BC31.BC33.";
-	info_nodes[63] = "BC33,2.95,0.BC32,BC34.building_A.";
-	info_nodes[64] = "BC34,2.360,0.ground.BC33.";
-	info_nodes[65] = "BC35,2.365,0.BC20B.SL4.";
-	info_nodes[66] = "BC36,2.255,0.BC30B.S12.";
-	info_nodes[67] = "YD1,2.34,0.BC25A.BC2A,BC2B,BC26.";
-	info_nodes[68] = "YD2,2.34,0.BC25B.BC2A,BC2B,BC26,XC1.";
-	info_nodes[69] = "XC1,2.58,0.YD2.XC2.";
-	info_nodes[70] = "XC2,2.600,0.XC1.SR12.";
-	info_nodes[71] = "ZW11,2.378,0.BC18A,BC18B.ZW12.";
-	info_nodes[72] = "ZW12,2.400,0.ZW11.silo.";
+	info_nodes[22] = "BC1A,2.380,2380,1880,1575,1880,0.11#,12#,13#,14#.BC2A,BC2B.";
+	info_nodes[23] = "BC1B,2.380,2380,1805,1575,1805,0.11#,12#,13#,14#.BC2A,BC2B.";
+	info_nodes[24] = "BC2A,2.1192,1510,1915,1510,1410,0.YD1,YD2,BC1A,BC1B,BC19.BC3A.";
+	info_nodes[25] = "BC2B,2.1192,1640,1915,1640,1335,0.YD1,YD2,BC1A,BC1B,BC19.BC3B.";
+	info_nodes[26] = "BC3A,2.45,1685,1370,1435,1370,0.BC2A.BC4A,BC4B,BC10,BC6A.";	//双向
+	info_nodes[27] = "BC3B,2.45,1685,1305,1435,1305,0.BC2B.BC4A,BC4B,BC10,BC6B.";	//双向
+	info_nodes[28] = "BC4A,2.205,1740,1305,1985,1305,0.BC3A,BC3B.BC5,BC9.";
+	info_nodes[29] = "BC4B,2.205,1740,1370,1880,1370,0.BC3A,BC3B.BC5,BC9.";
+	info_nodes[30] = "BC5,2.280,1985,1370,2250,1260,0.BC4A,BC4B.BC8.";
+	info_nodes[31] = "BC6A,2.230,1335,1370,1070,1370,1.BC3A,BC3B,BC26.BC7,BC11.";
+	info_nodes[32] = "BC6B,2.230,1335,1300,1070,1300,1.BC3B,BC26.BC7,BC11.";
+	info_nodes[33] = "BC7,2.235,965,1370,750,1370,1.BC6A,BC6B.BC12.";
+	info_nodes[34] = "BC8,2.1230,2250,1230,2250,900,1.BC5,SR6.SR6,BC13,BC17.";
+	info_nodes[35] = "BC9,2.1380,1930,1335,1930,900,1.BC4A,BC4B,SR7.SR7,BC13,BC17.";
+	info_nodes[36] = "BC10,2.1380,1385,1230,1385,900,1.BC3A,BC3B,SR8.SR8,BC13,BC17.";
+	info_nodes[37] = "BC11,2.1380,1000,1335,1000,900,1.BC6A,BC6B,SR9.SR9,BC18A,BC18B.";
+	info_nodes[38] = "BC12,2.1390,680,1400,680,900,1.BC7,SR10.SR10,BC18A,BC18B.";
+	info_nodes[39] = "BC13,2.665,1500,930,2645,930,0.BC8,BC9,BC10.BC14.";
+	info_nodes[40] = "BC14,2.610,2640,960,2640,1175,0.BC13.BC15.";
+	info_nodes[41] = "BC15,2.485,2680,1175,3900,1175,0.BC14.building_B.";
+	info_nodes[42] = "BC17,2.665,2315,860,1220,860,0.BC8,BC9,BC10.BC18A,BC18B.";
+	info_nodes[43] = "BC18A,2.458,1155,930,610,930,0.BC11,BC12,BC17.ZW11.";
+	info_nodes[44] = "BC18B,2.490,1137,860,580,860,0.BC11,BC12,BC17.ZW11,炼化.";
+	info_nodes[45] = "BC19,2.320,1065,1695,1575,1695,0.DS3.BC2A,BC2B.";
+	info_nodes[46] = "BC20A,2.914,4025,535,3210,535,0.1#,2#,3#,4#.BC21A.";
+	info_nodes[47] = "BC20B,2.945,4025,465,3160,465,0.1#,2#,3#,4#.BC21B.";
+	info_nodes[48] = "BC21A,2.265,3210,560,3210,645,0.BC20A.BC22A.";
+	info_nodes[49] = "BC21B,2.265,3120,490,3120,565,0.BC20B.BC22B.";
+	info_nodes[50] = "BC22A,2.1416,3215,670,2530,670,0.BC21A.BC23A,BC23B.";
+	info_nodes[51] = "BC22B,2.1410,3120,590,2530,590,0.BC21B.BC23A,BC23B.";
+	info_nodes[52] = "BC23A,2.646,2595,565,2595,825,0.BC22A,BC22B.BC24A.";
+	info_nodes[53] = "BC23B,2.635,2470,565,2470,745,0.BC22A,BC22B.BC24B,BC30A,BC30B.";
+	info_nodes[54] = "BC24A,2.965,2525,825,2525,1520,0.BC23A.BC25A.";
+	info_nodes[55] = "BC24B,2.970,2410,745,2410,1435,0.BC23B.BC25B.";
+	info_nodes[56] = "BC25A,2.696,2525,1550,1425,1550,0.BC24A.YD1.";
+	info_nodes[57] = "BC25B,2.696,2410,1465,1425,1460,0.BC24B.YD2.";
+	info_nodes[58] = "BC26,2.395,1260,1650,1260,1335,0.YD1,YD2.BC6A,BC6B.";
+	info_nodes[59] = "BC30A,2.235,2440,850,3050,850,0.BC23A,BC23B.BC31.";
+	info_nodes[60] = "BC30B,2.436,2470,800,3260,800,0.BC23B.BC36.";
+	info_nodes[61] = "BC31,2.645,3150,875,3150,1320,0.BC30A,SR11.SR11,BC32.";
+	info_nodes[62] = "BC32,2.155,3195,1325,3330,1325,0.BC31.BC33.";
+	info_nodes[63] = "BC33,2.95,3395,1325,3630,1325,0.BC32,BC34.building_A.";
+	info_nodes[64] = "BC34,2.360,3570,1030,3360,1290,0.ground.BC33.";
+	info_nodes[65] = "BC35,2.365,3020,470,2660,470,0.BC20B.SL4.";
+	info_nodes[66] = "BC36,2.255,3290,800,3455,850,0.BC30B.S12.";
+	info_nodes[67] = "YD1,2.34,1555,1610,1330,1610,0.BC25A.BC2A,BC2B,BC26.";
+	info_nodes[68] = "YD2,2.34,1555,1520,1330,1520,0.BC25B.BC2A,BC2B,BC26,XC1.";
+	info_nodes[69] = "XC1,2.58,1320,1540,980,1540,0.YD2.XC2.";
+	info_nodes[70] = "XC2,2.600,930,1540,565,1540,0.XC1.SR12.";
+	info_nodes[71] = "ZW11,2.378,540,935,200,985,0.BC18A,BC18B.ZW12.";
+	info_nodes[72] = "ZW12,2.400,160,970,160,2180,0.ZW11.silo.";
 	info_nodes[73] = "ground,10..BC34.";		//地坑
 	//数据读取
 	this->node.this_code = 0;
@@ -113,6 +121,9 @@ Web::Web()
 	this->node.convLength = 0;
 	this->node.convSpeed = 0;
 	this->node.convPos = 0.0f;
+	this->node.convCode = -1;
+	this->node.convCoords[4] = layer_belts;
+	this->node.convCoords[5] = 0.0f;
 	this->node.out = 0;
 	this->node.out_flux = 0.0f;
 	this->node.out_type = 0;
@@ -131,8 +142,27 @@ Web::Web()
 		{
 			this->node.convLength = stoi(info_nodes[i].substr(last_pos, info_nodes[i].find(',', last_pos) - last_pos));
 			last_pos = info_nodes[i].find(',', last_pos) + 1;
+			this->node.convCoords[0] = stof(info_nodes[i].substr(last_pos, info_nodes[i].find(',', last_pos) - last_pos)) / (CT_WIDTH / 10.0f) - 5.0f;
+			last_pos = info_nodes[i].find(',', last_pos) + 1;
+			this->node.convCoords[1] = -stof(info_nodes[i].substr(last_pos, info_nodes[i].find(',', last_pos) - last_pos)) / (CT_WIDTH / 10.0f) + (CT_HEIGHT * 5.0f / CT_WIDTH);
+			last_pos = info_nodes[i].find(',', last_pos) + 1;
+			this->node.convCoords[2] = stof(info_nodes[i].substr(last_pos, info_nodes[i].find(',', last_pos) - last_pos)) / (CT_WIDTH / 10.0f) - 5.0f;
+			last_pos = info_nodes[i].find(',', last_pos) + 1;
+			this->node.convCoords[3] = -stof(info_nodes[i].substr(last_pos, info_nodes[i].find(',', last_pos) - last_pos)) / (CT_WIDTH / 10.0f) + (CT_HEIGHT * 5.0f / CT_WIDTH);
+			last_pos = info_nodes[i].find(',', last_pos) + 1;
 			this->node.convSpeed = stoi(info_nodes[i].substr(last_pos, info_nodes[i].find('.', last_pos) - last_pos)) ? 3.5f : 3.15f;
 			last_pos = info_nodes[i].find('.', last_pos) + 1;
+			this->node.convCoords[4] += 0.0001f;
+			this->node.convCode++;
+		}
+		else
+		{
+			this->node.convLength = 0;
+			this->node.convSpeed = 0.0f;
+			this->node.convCoords[0] = 0.0f;
+			this->node.convCoords[1] = 0.0f;
+			this->node.convCoords[2] = 0.0f;
+			this->node.convCoords[3] = 0.0f;
 		}
 		//录入前端
 		this->node.pre_codes.clear();
@@ -171,7 +201,25 @@ Web::Web()
 		this->nodes.push_back(this->node);
 		this->node.this_code++;
 	}
-
+	for (int i = 0; i < 51; i++)
+	{
+		this->convAmount[i] = 0.0f;
+	}
+	for (int i = 0; i < 7; i++)
+	{
+		this->frag_child.fragCoords[i] = 0.0f;
+	}
+	glGenVertexArrays(1, &fragVAO);
+	glGenBuffers(1, &fragVBO);
+	glBindVertexArray(fragVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, fragVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(this->frag_child.fragCoords), &this->frag_child.fragCoords, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(2 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
+	glEnableVertexAttribArray(2);
 }
 
 void Web::reset()
@@ -188,7 +236,16 @@ void Web::reset()
 			it3->act = false;
 		}
 		it1->wheelMode = false;
+		if (it1->type == 2)
+		{
+			it1->frags.clear();
+		}
 	}
+	for (int i = 0; i < 51; i++)
+	{
+		this->convAmount[i] = 0.0f;
+	}
+	this->finishEndName = "NULL";
 }
 
 void Web::initGuiStyle()
@@ -196,14 +253,85 @@ void Web::initGuiStyle()
 	this->style = &ImGui::GetStyle();
 }
 
-void Web::update(SimuCore& simucore, float simurate)
+void Web::drawFrags(Camera& camera, Shader& fragsShader)
 {
+	fragsShader.use();
+	//仅画线模式
+	glLineWidth(3.0f);
+	glBindVertexArray(fragVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, fragVBO);
+	this->model = glm::mat4(1.0f);
+	fragsShader.setMat4("model", this->model);
+	this->projection = glm::perspective(glm::radians(camera.Zoom), float(SCR_WIDTH) / float(SCR_HEIGHT), 0.1f, 100.0f);
+	fragsShader.setMat4("projection", this->projection);
+	this->view = glm::mat4(1.0f);
+	this->view = camera.GetViewMatrix();
+	fragsShader.setMat4("view", this->view);
 	FindNode findnode;
+	findnode.target = "BC1A";
+	std::vector<Node>::iterator it_frag = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+	for (; it_frag->type == 2; it_frag++)
+	{
+		if (it_frag->frags.size())
+		{
+			for (std::vector<FragChild>::iterator it1 = it_frag->frags.begin(); it1 != it_frag->frags.end(); it1++)
+			{
+				glBufferData(GL_ARRAY_BUFFER, sizeof(it1->fragCoords), &it1->fragCoords, GL_STATIC_DRAW);
+				glDrawArrays(GL_POINTS, 0, 1);
+			}
+		}
+	}
+}
+
+void Web::update(SimuCore& simucore, float gapTime, float simurate)
+{
+	this->finishEndName = "NULL";
+	FindNode findnode;
+	//存在煤炭片段时，刷新预备
+	if (this->fragments.size())
+	{
+		for (int i = 0; i < 51; i++)
+		{
+			this->convAmount[i] = 0.0f;
+		}
+		//子容器的刷新重置在函数的开头；只有在当前皮带的前后存在连接（意思是当前皮带不处于停止状态）情况下需要刷新前的容器清空操作
+		findnode.target = "BC1A";
+		std::vector<Node>::iterator it_frag = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+		for (; it_frag->type == 2; it_frag++)
+		{
+			int temp = 0;
+			for (std::vector<PrePos>::iterator it_0 = it_frag->pos_codes.begin(); it_0 != it_frag->pos_codes.end(); it_0++)
+			{
+				if (it_0->act)
+				{
+					temp = 1;
+					break;
+				}
+			}
+			if (temp == 0)
+			{
+				for (std::vector<PrePos>::iterator it_0 = it_frag->pre_codes.begin(); it_0 != it_frag->pre_codes.end(); it_0++)
+				{
+					if (it_0->act)
+					{
+						temp = 1;
+						break;
+					}
+				}
+			}
+			//如果当前皮带的前后都无连接，就不刷新容器
+			if (temp != 0)
+			{
+				it_frag->frags.clear();
+			}
+		}
+	}
 	for (std::vector<Fragment>::iterator it1 = this->fragments.begin(); it1 != this->fragments.end(); )
 	{
 		int erased = false;
 		//寻找当前片段的起始节点之首
 		findnode.target = *it1->froms.begin();
+		//起源节点
 		std::vector<Node>::iterator it_from_first = find_if(this->nodes.begin(), this->nodes.end(), findnode);
 		//寻找当前片段的第一节皮带节点
 		int temp = 0;
@@ -219,11 +347,13 @@ void Web::update(SimuCore& simucore, float simurate)
 		if (temp == 0)
 		{
 			//没有找到始源节点的下一个节点，跳过本片段不更新
+			it1++;
 			continue;
 		}
+		//第一段皮带节点
 		std::vector<Node>::iterator it_begin = find_if(this->nodes.begin(), this->nodes.end(), findnode);
-		//寻找当前片段的起终止节点
 		findnode.target = it1->to;
+		//终止节点
 		std::vector<Node>::iterator it_to = find_if(this->nodes.begin(), this->nodes.end(), findnode);
 		//寻找当前片段的最后一节皮带节点
 		for (std::vector<PrePos>::iterator it_0 = it_to->pre_codes.begin(); it_0 != it_to->pre_codes.end(); it_0++)
@@ -234,14 +364,15 @@ void Web::update(SimuCore& simucore, float simurate)
 				break;
 			}
 		}
+		//最后一段皮带节点
 		std::vector<Node>::iterator it_end = find_if(this->nodes.begin(), this->nodes.end(), findnode);
-		//更新前排
 		std::vector<Node>::iterator it_cur;
+		//更新前排
 		if (it1->begin < it1->total_length)
 		{
 			//前排固定向前推进
 			it_cur = it_begin;
-			while (it1->begin < it_cur->convPos)
+			while (it1->begin > it_cur->convPos)
 			{
 				std::vector<PrePos>::iterator it2 = it_cur->pos_codes.begin();
 				for (; it2 != it_cur->pos_codes.end(); it2++)
@@ -254,7 +385,7 @@ void Web::update(SimuCore& simucore, float simurate)
 				findnode.target = it2->other_name;
 				it_cur = find_if(this->nodes.begin(), this->nodes.end(), findnode);
 			}
-			it1->begin += it_cur->convSpeed * simurate * SPEEDLAG;
+			it1->begin += it_cur->convSpeed * gapTime * simurate * SPEEDLAG;
 			if (it1->begin > it1->total_length)
 			{
 				it1->begin = it1->total_length;
@@ -265,7 +396,7 @@ void Web::update(SimuCore& simucore, float simurate)
 		{
 			//此时此片段已经不接受来自源头的补给，所以后排向前推进
 			it_cur = it_begin;
-			while (it1->end < it_cur->convPos)
+			while (it1->end > it_cur->convPos)
 			{
 				std::vector<PrePos>::iterator it2 = it_cur->pos_codes.begin();
 				for (; it2 != it_cur->pos_codes.end(); it2++)
@@ -278,74 +409,222 @@ void Web::update(SimuCore& simucore, float simurate)
 				findnode.target = it2->other_name;
 				it_cur = find_if(this->nodes.begin(), this->nodes.end(), findnode);
 			}
-			it1->end += it_cur->convSpeed * simurate * SPEEDLAG;
+			it1->end += it_cur->convSpeed * gapTime * simurate * SPEEDLAG;
 			if (it1->end > it1->total_length)
 			{
 				//当后排到达终止位置，删除此片段
+				this->finishEndName = it1->to;
 				it1 = this->fragments.erase(it1);
 				erased = true;
 			}
 		}
-		//更新存量
-		if (!it1->disconnected)
+		if (!erased)
 		{
-			float delta_amount = 0.0f;		//存量增量
-			if (it1->froms.size() == 1)
+			//更新存量
+			if (!it1->disconnected)
 			{
-				//源节点非泊位卸船机
-				if (!it_from_first->out)
+				float delta_amount = 0.0f;		//存量增量
+				if (it1->froms.size() == 1)
 				{
-					//源头输出停止，停止增加货物
-					it1->disconnected = !it1->disconnected;
+					//源节点非泊位卸船机
+					if (!it_from_first->out)
+					{
+						//源头输出停止，停止增加货物
+						it1->disconnected = !it1->disconnected;
+					}
+					else
+					{
+						//源头有输入，增加货物
+						delta_amount = it_from_first->out_flux * gapTime * simurate * SPEEDLAG;
+					}
 				}
 				else
 				{
-					//源头有输入，增加货物
-					delta_amount = it_from_first->out_flux * simurate * SPEEDLAG;
+					//源节点是4台泊位卸船机
+					std::vector<std::string>::iterator it_name = it1->froms.begin();
+					findnode.target = *it_name;
+					std::vector<Node>::iterator it_from_1 = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+					it_name++;
+					findnode.target = *it_name;
+					std::vector<Node>::iterator it_from_2 = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+					it_name++;
+					findnode.target = *it_name;
+					std::vector<Node>::iterator it_from_3 = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+					it_name++;
+					findnode.target = *it_name;
+					std::vector<Node>::iterator it_from_4 = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+					if (!it_from_1->out && !it_from_2->out && !it_from_3->out && !it_from_4->out)
+					{
+						//源头输出停止，停止增加货物
+						it1->disconnected = !it1->disconnected;
+					}
+					else
+					{
+						//源头有输入，增加货物
+						delta_amount = (it_from_1->out_flux + it_from_2->out_flux + it_from_3->out_flux + it_from_4->out_flux) * gapTime * simurate * SPEEDLAG;
+					}
+				}
+				//可以添加流入流量的随机波动
+				delta_amount *= simucore.genRandomFloat(0.95f, 1.05f);
+				it1->amount += delta_amount;
+			}
+			if (it1->begin == it1->total_length)
+			{
+				//末尾流入终止节点，减少货物
+				it1->amount -= it_end->convSpeed * gapTime * simurate * SPEEDLAG * UNIT_AMOUNT;
+				if (it1->amount < 0.0f)
+				{
+					it1->amount = 0.0f;
+				}
+			}
+			/*更新皮带存量数组*/
+			it_cur = it_begin;
+			//先将it_cur遍历到片段end末尾位置对应的皮带
+			while (it1->end > it_cur->convPos)
+			{
+				std::vector<PrePos>::iterator it2 = it_cur->pos_codes.begin();
+				for (; it2 != it_cur->pos_codes.end(); it2++)
+				{
+					if (it2->act)
+					{
+						break;
+					}
+				}
+				findnode.target = it2->other_name;
+				it_cur = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+			}
+			//在end到begin的皮带区间一边向前遍历一边更新皮带容量数组
+			if (it_cur->convPos >= it1->begin && it_cur->convPos - it_cur->convLength < it1->end)
+			{
+				//begin和end都在本皮带中的情况
+				this->convAmount[it_cur->convCode] += it1->amount;
+				this->frag_child.fragCoords[0] = it_cur->convCoords[0] + (it_cur->convCoords[2] - it_cur->convCoords[0]) * ((it1->end - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+				this->frag_child.fragCoords[1] = it_cur->convCoords[1] + (it_cur->convCoords[3] - it_cur->convCoords[1]) * ((it1->end - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+				this->frag_child.fragCoords[2] = it_cur->convCoords[0] + (it_cur->convCoords[2] - it_cur->convCoords[0]) * ((it1->begin - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+				this->frag_child.fragCoords[3] = it_cur->convCoords[1] + (it_cur->convCoords[3] - it_cur->convCoords[1]) * ((it1->begin - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+			}
+			else if (it_cur->convPos < it1->begin && it_cur->convPos - it_cur->convLength > it1->end)
+			{
+				//begin和end都在本皮带外的情况
+				this->convAmount[it_cur->convCode] += it1->amount * (it_cur->convLength / it1->total_length);
+				this->frag_child.fragCoords[0] = it_cur->convCoords[0];
+				this->frag_child.fragCoords[1] = it_cur->convCoords[1];
+				this->frag_child.fragCoords[2] = it_cur->convCoords[2];
+				this->frag_child.fragCoords[3] = it_cur->convCoords[3];
+			}
+			else if (it_cur->convPos >= it1->begin && it_cur->convPos - it_cur->convLength >= it1->end)
+			{
+				//begin在本皮带中，end在本皮带外的情况
+				this->convAmount[it_cur->convCode] += it1->amount * ((it1->begin - it_cur->convPos + it_cur->convLength) / it1->total_length);
+				this->frag_child.fragCoords[0] = it_cur->convCoords[0];
+				this->frag_child.fragCoords[1] = it_cur->convCoords[1];
+				this->frag_child.fragCoords[2] = it_cur->convCoords[0] + (it_cur->convCoords[2] - it_cur->convCoords[0]) * ((it1->begin - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+				this->frag_child.fragCoords[3] = it_cur->convCoords[1] + (it_cur->convCoords[3] - it_cur->convCoords[1]) * ((it1->begin - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+			}
+			else if (it_cur->convPos < it1->begin && it_cur->convPos - it_cur->convLength <= it1->end)
+			{
+				//begin在本皮带外，end在本皮带中的情况
+				this->convAmount[it_cur->convCode] += it1->amount * ((it_cur->convPos - it1->end) / it1->total_length);
+				this->frag_child.fragCoords[0] = it_cur->convCoords[0] + (it_cur->convCoords[2] - it_cur->convCoords[0]) * ((it1->end - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+				this->frag_child.fragCoords[1] = it_cur->convCoords[1] + (it_cur->convCoords[3] - it_cur->convCoords[1]) * ((it1->end - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+				this->frag_child.fragCoords[2] = it_cur->convCoords[2];
+				this->frag_child.fragCoords[3] = it_cur->convCoords[3];
+			}
+			this->frag_child.fragCoords[4] = it_cur->convCoords[4] + 0.0002f;
+			if (it1->cargo_type == 0)
+			{
+				this->frag_child.fragCoords[5] = 0.0f;
+			}
+			else if (it1->cargo_type == 1)
+			{
+				if (it1->cargo_index < 7)
+				{
+					this->frag_child.fragCoords[5] = (float)it1->cargo_index;
+				}
+				else
+				{
+					this->frag_child.fragCoords[5] = 7.0f;
 				}
 			}
 			else
 			{
-				//源节点是4台泊位卸船机
-				std::vector<std::string>::iterator it_name = it1->froms.begin();
-				findnode.target = *it_name;
-				std::vector<Node>::iterator it_from_1 = find_if(this->nodes.begin(), this->nodes.end(), findnode);
-				it_name++;
-				findnode.target = *it_name;
-				std::vector<Node>::iterator it_from_2 = find_if(this->nodes.begin(), this->nodes.end(), findnode);
-				it_name++;
-				findnode.target = *it_name;
-				std::vector<Node>::iterator it_from_3 = find_if(this->nodes.begin(), this->nodes.end(), findnode);
-				it_name++;
-				findnode.target = *it_name;
-				std::vector<Node>::iterator it_from_4 = find_if(this->nodes.begin(), this->nodes.end(), findnode);
-				if (!it_from_1->out && !it_from_2->out && !it_from_3->out && !it_from_4->out)
+				this->frag_child.fragCoords[5] = 7.0f;
+			}
+			this->frag_child.fragCoords[6] = it_cur->convCoords[5];
+			it_cur->frags.push_back(this->frag_child);
+			//此时it_cur处于第一段皮带，如果前排还在前面，就继续向前迭代
+			while (it1->begin > it_cur->convPos)
+			{
+				std::vector<PrePos>::iterator it2 = it_cur->pos_codes.begin();
+				for (; it2 != it_cur->pos_codes.end(); it2++)
 				{
-					//源头输出停止，停止增加货物
-					it1->disconnected = !it1->disconnected;
+					if (it2->act)
+					{
+						break;
+					}
+				}
+				findnode.target = it2->other_name;
+				it_cur = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+				//更新皮带节点的子片段容器
+				if (it_cur->convPos >= it1->begin && it_cur->convPos - it_cur->convLength < it1->end)
+				{
+					//begin和end都在本皮带中的情况
+					this->convAmount[it_cur->convCode] += it1->amount;
+					this->frag_child.fragCoords[0] = it_cur->convCoords[0] + (it_cur->convCoords[2] - it_cur->convCoords[0]) * ((it1->end - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+					this->frag_child.fragCoords[1] = it_cur->convCoords[1] + (it_cur->convCoords[3] - it_cur->convCoords[1]) * ((it1->end - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+					this->frag_child.fragCoords[2] = it_cur->convCoords[0] + (it_cur->convCoords[2] - it_cur->convCoords[0]) * ((it1->begin - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+					this->frag_child.fragCoords[3] = it_cur->convCoords[1] + (it_cur->convCoords[3] - it_cur->convCoords[1]) * ((it1->begin - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+				}
+				else if (it_cur->convPos < it1->begin && it_cur->convPos - it_cur->convLength > it1->end)
+				{
+					//begin和end都在本皮带外的情况
+					this->convAmount[it_cur->convCode] += it1->amount * (it_cur->convLength / it1->total_length);
+					this->frag_child.fragCoords[0] = it_cur->convCoords[0];
+					this->frag_child.fragCoords[1] = it_cur->convCoords[1];
+					this->frag_child.fragCoords[2] = it_cur->convCoords[2];
+					this->frag_child.fragCoords[3] = it_cur->convCoords[3];
+				}
+				else if (it_cur->convPos >= it1->begin && it_cur->convPos - it_cur->convLength >= it1->end)
+				{
+					//begin在本皮带中，end在本皮带外的情况
+					this->convAmount[it_cur->convCode] += it1->amount * ((it1->begin - it_cur->convPos + it_cur->convLength) / it1->total_length);
+					this->frag_child.fragCoords[0] = it_cur->convCoords[0];
+					this->frag_child.fragCoords[1] = it_cur->convCoords[1];
+					this->frag_child.fragCoords[2] = it_cur->convCoords[0] + (it_cur->convCoords[2] - it_cur->convCoords[0]) * ((it1->begin - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+					this->frag_child.fragCoords[3] = it_cur->convCoords[1] + (it_cur->convCoords[3] - it_cur->convCoords[1]) * ((it1->begin - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+				}
+				else if (it_cur->convPos < it1->begin && it_cur->convPos - it_cur->convLength <= it1->end)
+				{
+					//begin在本皮带外，end在本皮带中的情况
+					this->convAmount[it_cur->convCode] += it1->amount * ((it_cur->convPos - it1->end) / it1->total_length);
+					this->frag_child.fragCoords[0] = it_cur->convCoords[0] + (it_cur->convCoords[2] - it_cur->convCoords[0]) * ((it1->end - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+					this->frag_child.fragCoords[1] = it_cur->convCoords[1] + (it_cur->convCoords[3] - it_cur->convCoords[1]) * ((it1->end - it_cur->convPos + it_cur->convLength) / it_cur->convLength);
+					this->frag_child.fragCoords[2] = it_cur->convCoords[2];
+					this->frag_child.fragCoords[3] = it_cur->convCoords[3];
+				}
+				this->frag_child.fragCoords[4] = it_cur->convCoords[4] + 0.0002f;
+				if (it1->cargo_type == 0)
+				{
+					this->frag_child.fragCoords[5] = 0.0f;
+				}
+				else if (it1->cargo_type == 1)
+				{
+					if (it1->cargo_index < 7)
+					{
+						this->frag_child.fragCoords[5] = (float)it1->cargo_index;
+					}
+					else
+					{
+						this->frag_child.fragCoords[5] = 7.0f;
+					}
 				}
 				else
 				{
-					//源头有输入，增加货物
-					delta_amount = (it_from_1->out_flux + it_from_2->out_flux + it_from_3->out_flux + it_from_4->out_flux) * simurate * SPEEDLAG;
+					this->frag_child.fragCoords[5] = 7.0f;
 				}
+				this->frag_child.fragCoords[6] = it_cur->convCoords[5];
+				it_cur->frags.push_back(this->frag_child);
 			}
-			//可以添加流入流量的随机波动
-			
-
-			it1->amount += delta_amount;
-		}
-		if (it1->begin == it1->total_length)
-		{
-			//末尾流入终止节点，减少货物
-			it1->amount -= it_end->convSpeed * simurate * SPEEDLAG * UNIT_AMOUNT;
-			if (it1->amount < 0.0f)
-			{
-				it1->amount = 0.0f;
-			}
-		}
-		if (!erased)
-		{
 			it1++;
 		}
 	}
@@ -720,23 +999,56 @@ void Web::start_input(std::string from_name, int type, int index, float flux)
 		float length_accumulate = 0.0f;
 		bool next = true;		//是否允许继续遍历标志符，当当前节点的后面有激活的节点时，继续遍历；或当前节点为终止节点，停止遍历
 		std::vector<Node>::iterator it1;		//内部使用node迭代器
-		for (std::vector<PrePos>::iterator it0 = it->pos_codes.begin(); it0 != it->pos_codes.end(); it0++)
+		std::vector<Node>::iterator it2;		//检测卸船机使用node迭代器
+		//若当前节点是卸船机节点，需要确保当前泊位四台卸船机都是停机状态，而现在要启动其中一台时，才创建一个新的煤炭片段
+		if (it1->name == "1#" || it1->name == "2#" || it1->name == "3#" || it1->name == "4#")
 		{
-			if (it0->act)
+			std::string tempName[4] = { "1#", "2#", "3#", "4#" };
+			for (int i = 0; i < 4; i++)
 			{
-				findnode.target = it0->other_name;
-				temp = 1;
-				break;
+				findnode.target = tempName[i];
+				it2 = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+				if (it2->out)
+				{
+					allowed = false;
+					break;
+				}
 			}
 		}
-		if (temp == 0)
+		else if (it1->name == "11#" || it1->name == "12#" || it1->name == "13#" || it1->name == "14#")
 		{
-			//源节点没有激活的后续节点，无法输出，跳过
-			allowed = false;
+			std::string tempName[4] = { "11#", "12#", "13#", "14#" };
+			for (int i = 0; i < 4; i++)
+			{
+				findnode.target = tempName[i];
+				it2 = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+				if (it2->out)
+				{
+					allowed = false;
+					break;
+				}
+			}
 		}
-		else
+		if (allowed)
 		{
-			it1 = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+			for (std::vector<PrePos>::iterator it0 = it->pos_codes.begin(); it0 != it->pos_codes.end(); it0++)
+			{
+				if (it0->act)
+				{
+					findnode.target = it0->other_name;
+					temp = 1;
+					break;
+				}
+			}
+			if (temp == 0)
+			{
+				//源节点没有激活的后续节点，无法输出，跳过
+				allowed = false;
+			}
+			else
+			{
+				it1 = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+			}
 		}
 		//it1指向第一段皮带
 		while (allowed && next)
@@ -1236,6 +1548,36 @@ bool Web::cancelCheck(std::vector<std::string>& equipments)
 		}
 	}
 	return ret;
+}
+
+void Web::set_focus(std::vector<std::string>& equipments)
+{
+	FindNode findnode;
+	findnode.target = "BC1A";
+	std::vector<Node>::iterator it_frag = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+	for (; it_frag->type == 2; it_frag++)
+	{
+		it_frag->convCoords[5] = 1.0f;
+		for (std::vector<std::string>::const_iterator it1 = equipments.begin(); it1 != equipments.end(); it1++)
+		{
+			if (*it1 == it_frag->name)
+			{
+				it_frag->convCoords[5] = 0.0f;
+				break;
+			}
+		}
+	}
+}
+
+void Web::lose_focus()
+{
+	FindNode findnode;
+	findnode.target = "BC1A";
+	std::vector<Node>::iterator it_frag = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+	for (; it_frag->type == 2; it_frag++)
+	{
+		it_frag->convCoords[5] = 0.0f;
+	}
 }
 
 void Web::pre_button(bool choosed)

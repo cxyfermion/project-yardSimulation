@@ -13,11 +13,11 @@
 #define layer_bucket 0.0058f			//抓斗图层
 #define layer_ship 0.0054f				//船图层
 #define unloader_pow 1915			//卸船机运行功率
-#define bucket_speed_hor 0.01f		//抓斗水平移动速度
-#define bucket_speed_ver 0.01f		//抓斗垂直移动速度
-#define bucket_speed_up 0.02f			//抓斗皮带空载起升速度
-#define bucket_speed_reset 0.04f		//抓斗水平移向闲置位速度
-constexpr auto speed_ship = 0.005f;	//船舶移动速度;
+#define bucket_speed_hor 1.0f			//抓斗水平移动速度
+#define bucket_speed_ver 1.0f			//抓斗垂直移动速度
+#define bucket_speed_up 2.0f			//抓斗皮带空载起升速度
+#define bucket_speed_reset 4.0f		//抓斗水平移向闲置位速度
+constexpr auto speed_ship = 0.006f;	//船舶移动速度;
 
 Berth::Berth()
 {
@@ -1286,7 +1286,7 @@ void Berth::unloader_dispatch()
 	}
 }
 
-void Berth::updateBuckets(float simurate)
+void Berth::updateBuckets(float gapTime, float simurate)
 {
 	//抓斗状态更新代码
 	//float rate_ceiling = simurate > 20.0f ? 20.0f : simurate;
@@ -1306,13 +1306,13 @@ void Berth::updateBuckets(float simurate)
 					if (it->crab_bucket_ver < 1.0f)
 					{
 						//抓斗未升到位，y不变，hor向上，抓斗有煤
-						it->crab_bucket_ver += 0.1f * bucket_speed_ver * rate_ceiling;
+						it->crab_bucket_ver += 0.1f * bucket_speed_ver * gapTime * rate_ceiling;
 						//this->bucket_coords[5 * it->unloader_index + 3] = 0.0f;
 					}
 					else
 					{
 						//抓斗升到位，向皮带运行
-						it->crab_bucket_hor += 0.1f * bucket_speed_hor * rate_ceiling;
+						it->crab_bucket_hor += 0.1f * bucket_speed_hor * gapTime * rate_ceiling;
 						if (it->crab_bucket_switch == false)
 						{
 							//A皮带
@@ -1346,7 +1346,7 @@ void Berth::updateBuckets(float simurate)
 				else if (it->crab_bucket_hor < 1.0f)
 				{
 					//抓斗升到位，向皮带运行
-					it->crab_bucket_hor += 0.1f * bucket_speed_hor * rate_ceiling;
+					it->crab_bucket_hor += 0.1f * bucket_speed_hor * gapTime * rate_ceiling;
 					if (it->crab_bucket_switch == false)
 					{
 						//A皮带
@@ -1382,8 +1382,8 @@ void Berth::updateBuckets(float simurate)
 					if (it->crab_bucket_ver > 0.0f)
 					{
 						//抓斗未降到位，抓斗下降，抓斗卸煤，颜色变浅
-						it->crab_bucket_ver -= 0.1f * bucket_speed_ver * rate_ceiling;
-						this->bucket_coords[5 * it->unloader_index + 3] += 0.1f * bucket_speed_ver * rate_ceiling;
+						it->crab_bucket_ver -= 0.1f * bucket_speed_ver * gapTime * rate_ceiling;
+						this->bucket_coords[5 * it->unloader_index + 3] += 0.1f * bucket_speed_ver * gapTime * rate_ceiling;
 						//数值校正
 						if (this->bucket_coords[5 * it->unloader_index + 3] > 1.0f || it->crab_bucket_ver < 0.0f)
 						{
@@ -1407,7 +1407,7 @@ void Berth::updateBuckets(float simurate)
 				if (it->crab_bucket_ver < 1.0f)
 				{
 					//抓斗未升到位，向上升
-					it->crab_bucket_ver += 0.1f * bucket_speed_ver * rate_ceiling;
+					it->crab_bucket_ver += 0.1f * bucket_speed_ver * gapTime * rate_ceiling;
 				}
 				else
 				{
@@ -1415,7 +1415,7 @@ void Berth::updateBuckets(float simurate)
 					if (it->crab_bucket_hor > -1.0f)
 					{
 						//抓斗未就位，向闲置位置移动
-						it->crab_bucket_hor -= 0.1f * bucket_speed_reset * rate_ceiling;
+						it->crab_bucket_hor -= 0.1f * bucket_speed_reset * gapTime * rate_ceiling;
 						if (it->crab_bucket_switch == false)
 						{
 							//A皮带
@@ -1454,7 +1454,7 @@ void Berth::updateBuckets(float simurate)
 			if (it->crab_bucket_hor < 0.0f)
 			{
 				//抓斗正闲置情况下将抓斗移动到工作位置（跨过皮带，无需考虑crab_bucket_switch）
-				it->crab_bucket_hor += 0.1f * bucket_speed_hor * rate_ceiling;
+				it->crab_bucket_hor += 0.1f * bucket_speed_hor * gapTime * rate_ceiling;
 				//数值校正
 				if (it->crab_bucket_hor > 0.0f)
 					it->crab_bucket_hor = 0.0f;
@@ -1481,7 +1481,7 @@ void Berth::updateBuckets(float simurate)
 						if (it->crab_bucket_ver < 1.0f)
 						{
 							//抓斗未升到位，y不变，hor向上，抓斗为空，是白色
-							it->crab_bucket_ver += 0.1f * bucket_speed_up * rate_ceiling;
+							it->crab_bucket_ver += 0.1f * bucket_speed_up * gapTime * rate_ceiling;
 							//数值校正
 							if (it->crab_bucket_ver > 1.0f)
 								it->crab_bucket_ver = 1.0f;
@@ -1490,7 +1490,7 @@ void Berth::updateBuckets(float simurate)
 						else
 						{
 							//抓斗升到位，向船运行
-							it->crab_bucket_hor -= 0.1f * bucket_speed_hor * rate_ceiling;
+							it->crab_bucket_hor -= 0.1f * bucket_speed_hor * gapTime * rate_ceiling;
 							if (it->crab_bucket_switch == false)
 							{
 								//A皮带
@@ -1527,7 +1527,7 @@ void Berth::updateBuckets(float simurate)
 						if (it->crab_bucket_ver < 1.0f)
 						{
 							//抓斗未升到位，y不变，hor向上
-							it->crab_bucket_ver += 0.1f * bucket_speed_up * rate_ceiling;
+							it->crab_bucket_ver += 0.1f * bucket_speed_up * gapTime * rate_ceiling;
 							//数值校正
 							if (it->crab_bucket_ver > 1.0f)
 								it->crab_bucket_ver = 1.0f;
@@ -1535,7 +1535,7 @@ void Berth::updateBuckets(float simurate)
 						else
 						{
 							//抓斗升到位，向船运行
-							it->crab_bucket_hor -= 0.1f * bucket_speed_hor * rate_ceiling;
+							it->crab_bucket_hor -= 0.1f * bucket_speed_hor * gapTime * rate_ceiling;
 							//数值校正
 							if (it->crab_bucket_hor < 0.0f)
 								it->crab_bucket_hor = 0.0f;
@@ -1575,8 +1575,8 @@ void Berth::updateBuckets(float simurate)
 						if (it->crab_bucket_ver > 0.0f)
 						{
 							//抓斗未降到位，抓斗下降，抓斗装煤，颜色变深
-							it->crab_bucket_ver -= 0.1f * bucket_speed_ver * rate_ceiling;
-							this->bucket_coords[5 * it->unloader_index + 3] -= 0.1f * bucket_speed_ver * rate_ceiling;
+							it->crab_bucket_ver -= 0.1f * bucket_speed_ver * gapTime * rate_ceiling;
+							this->bucket_coords[5 * it->unloader_index + 3] -= 0.1f * bucket_speed_ver * gapTime * rate_ceiling;
 							//数值校正
 							if (this->bucket_coords[5 * it->unloader_index + 3] < 0.0f || it->crab_bucket_ver < 0.0f)
 							{
@@ -1585,7 +1585,7 @@ void Berth::updateBuckets(float simurate)
 								it->crab_bucket_loaded = true;
 							}
 							//船卸煤
-							this->bucket_unload(simurate, *it);
+							this->bucket_unload(gapTime, simurate, *it);
 						}
 						else
 						{
@@ -1605,7 +1605,7 @@ void Berth::updateBuckets(float simurate)
 						if (it->crab_bucket_ver < 1.0f)
 						{
 							//抓斗未升到位，y不变，hor向上，抓斗为满，是黑色
-							it->crab_bucket_ver += 0.1f * bucket_speed_ver * simurate;
+							it->crab_bucket_ver += 0.1f * bucket_speed_ver * gapTime * rate_ceiling;
 							//数值校正
 							if (it->crab_bucket_ver > 1.0f)
 								it->crab_bucket_ver = 1.0f;
@@ -1614,7 +1614,7 @@ void Berth::updateBuckets(float simurate)
 						else
 						{
 							//抓斗升到位，向皮带运行
-							it->crab_bucket_hor += 0.1f * bucket_speed_hor * rate_ceiling;
+							it->crab_bucket_hor += 0.1f * bucket_speed_hor * gapTime * rate_ceiling;
 							if (it->crab_bucket_switch == false)
 							{
 								//A皮带
@@ -1648,7 +1648,7 @@ void Berth::updateBuckets(float simurate)
 					else if (it->crab_bucket_hor < 1.0f)
 					{
 						//抓斗升到位，向皮带运行
-						it->crab_bucket_hor += 0.1f * bucket_speed_hor * rate_ceiling;
+						it->crab_bucket_hor += 0.1f * bucket_speed_hor * gapTime * rate_ceiling;
 						//数值校正
 						if (it->crab_bucket_hor > 1.0f)
 							it->crab_bucket_hor = 1.0f;
@@ -1687,8 +1687,8 @@ void Berth::updateBuckets(float simurate)
 						if (it->crab_bucket_ver > 0.0f)
 						{
 							//抓斗未降到位，抓斗下降，抓斗卸煤，颜色变浅
-							it->crab_bucket_ver -= 0.1f * bucket_speed_ver * rate_ceiling;
-							this->bucket_coords[5 * it->unloader_index + 3] += 0.1f * bucket_speed_ver * rate_ceiling;
+							it->crab_bucket_ver -= 0.1f * bucket_speed_ver * gapTime * rate_ceiling;
+							this->bucket_coords[5 * it->unloader_index + 3] += 0.1f * bucket_speed_ver * gapTime * rate_ceiling;
 							//数值校正
 							if (this->bucket_coords[5 * it->unloader_index + 3] > 1.0f || it->crab_bucket_ver < 0.0f)
 							{
@@ -1711,7 +1711,7 @@ void Berth::updateBuckets(float simurate)
 	}
 }
 
-int Berth::updateShips(float simurate)
+int Berth::updateShips(float gapTime, float simurate)
 {
 	int ship_ret = 0;
 	//船只状态更新代码
@@ -1842,8 +1842,8 @@ int Berth::updateShips(float simurate)
 			else
 			{
 				//船只未到位，移动
-				it->ship_coords[0] += (float)(speed_ship * cos(it->angle)) * simurate;
-				it->ship_coords[1] += (float)(speed_ship * sin(it->angle)) * simurate;
+				it->ship_coords[0] += (float)(speed_ship * cos(it->angle)) * gapTime *simurate;
+				it->ship_coords[1] += (float)(speed_ship * sin(it->angle)) * gapTime * simurate;
 			}
 			it->ship_dist = temp_dist;
 		}
@@ -1857,7 +1857,7 @@ int Berth::updateShips(float simurate)
 			//卸船的船储量变动
 			if (it->berth_idx == 4 && this->loader.loader_state == 2)
 			{
-				it->ship_current_storage += FLUX_LAOD * simurate;
+				it->ship_current_storage += FLUX_LAOD * gapTime * simurate;
 				if (it->ship_current_storage > it->ship_total_storage)
 				{
 					it->ship_current_storage = it->ship_total_storage;
@@ -1910,8 +1910,8 @@ int Berth::updateShips(float simurate)
 			else
 			{
 				//船舶正在原路返回
-				it->ship_coords[0] -= (float)(speed_ship * cos(it->angle)) * simurate;
-				it->ship_coords[1] -= (float)(speed_ship * sin(it->angle)) * simurate;
+				it->ship_coords[0] -= (float)(speed_ship * cos(it->angle)) * gapTime * simurate;
+				it->ship_coords[1] -= (float)(speed_ship * sin(it->angle)) * gapTime * simurate;
 			}
 		}
 		if (temp)
@@ -2441,7 +2441,7 @@ bool Berth::type_check(int type, int index)
 	return ret;
 }
 
-void Berth::bucket_unload(float simurate, ShipUnloader& unloader)
+void Berth::bucket_unload(float gapTime, float simurate, ShipUnloader& unloader)
 {
 	int berth_index = 0;	//0为21号泊位，1为22号泊位，2为4号泊位右，3为4号泊位左
 	switch (unloader.unloader_index)
@@ -2478,7 +2478,7 @@ void Berth::bucket_unload(float simurate, ShipUnloader& unloader)
 	{
 		if (it2->berth_idx == berth_index)
 		{
-			it2->ship_current_storage -= FLUX_BUCKET * simurate;
+			it2->ship_current_storage -= FLUX_BUCKET * gapTime *simurate;
 			if (it2->ship_current_storage < 0.0)
 			{
 				//卸空

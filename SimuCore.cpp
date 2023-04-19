@@ -18,6 +18,10 @@ SimuCore::SimuCore()
 	this->reset_rand = false;
 	this->terminate_time = 86400.0;	//24Hour
 	this->terminate_countdown = 86400.0;
+	this->freshGapSwitch = 2;		//50ms
+	this->freshGapTime = 0.05;
+	this->curGapTime = 0.0;
+	this->freshRequire = false;
 }
 
 void SimuCore::initGuiStyle()
@@ -52,6 +56,8 @@ void SimuCore::simulator_gui()
 			this->simuTime = 0.0;
 			this->run_rate = 1.0f;
 			this->reset_zero = true;
+			this->curGapTime = 0.0;
+			this->freshRequire = false;
 		}
 		this->pre_button(false);
 		ImGui::SameLine();
@@ -63,6 +69,8 @@ void SimuCore::simulator_gui()
 			this->simuTime = 0.0;
 			this->run_rate = 1.0f;
 			this->reset_rand = true;
+			this->curGapTime = 0.0;
+			this->freshRequire = false;
 		}
 		this->pre_button(false);
 		ImGui::SameLine();
@@ -94,6 +102,42 @@ void SimuCore::simulator_gui()
 		else */if (this->run_rate != simu_rate)
 		{
 			this->run_rate = simu_rate;
+		}
+		ImGui::Text(u8"设定画面刷新间隔：");
+		ImGui::SameLine();
+		ImGui::RadioButton("20ms, 50FPS", &this->freshGapSwitch, 1);
+		ImGui::SameLine();
+		ImGui::RadioButton("50ms, 20FPS", &this->freshGapSwitch, 2);
+		ImGui::SameLine();
+		ImGui::RadioButton("100ms, 10FPS", &this->freshGapSwitch, 3);
+		ImGui::SameLine();
+		ImGui::RadioButton("200ms, 5FPS", &this->freshGapSwitch, 4);
+		ImGui::SameLine();
+		ImGui::RadioButton("500ms, 2FPS", &this->freshGapSwitch, 5);
+		ImGui::SameLine();
+		ImGui::RadioButton("1000ms, 1FPS", &this->freshGapSwitch, 6);
+		switch (this->freshGapSwitch)
+		{
+		case 1:
+			this->freshGapTime = 0.02;
+			break;
+		case 2:
+			this->freshGapTime = 0.05;
+			break;
+		case 3:
+			this->freshGapTime = 0.1;
+			break;
+		case 4:
+			this->freshGapTime = 0.2;
+			break;
+		case 5:
+			this->freshGapTime = 0.5;
+			break;
+		case 6:
+			this->freshGapTime = 1.0;
+			break;
+		default:
+			break;
 		}
 		ImGui::Text(u8"运行时间：");
 		ImGui::SameLine();
@@ -135,7 +179,8 @@ void SimuCore::base_info()
 		ImGui::SameLine();
 	}
 	ImGui::Text((std::to_string(this->runtime_seconds) + u8" 秒").c_str());
-	ImGui::Text(u8"移动：W A S D；视角：MOUSE2；退出：ESC；控制台（未实装）：~");
+	ImGui::Text(u8"移动：W A S D R F；视角：MOUSE2（按住）；视野：UP DOWN；退出：ESC");
+	ImGui::Text(u8"快速移动：LEFT SHIFT（按住）；缓慢移动：LEFT CONTROL（按住）；控制台（未实装）：~");
 }
 
 void SimuCore::updateTime()
@@ -146,6 +191,12 @@ void SimuCore::updateTime()
 		this->simu_deltaTime = this->time - this->simu_lastFrame;
 		this->simu_lastFrame = this->time;
 		this->simuTime += this->simu_deltaTime * this->run_rate;
+		this->curGapTime += this->simu_deltaTime;
+		if (this->curGapTime > this->freshGapTime)
+		{
+			this->freshRequire = true;
+			this->curGapTime -= this->freshGapTime;
+		}
 		this->terminate_countdown -= this->simu_deltaTime * this->run_rate;
 		if (this->terminate_countdown < 0.0)
 		{

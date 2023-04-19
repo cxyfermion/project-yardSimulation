@@ -1,6 +1,6 @@
 #include "Flow.h"
 
-#define FLUX 0.0022f					//流程通用流量
+#define FLUX 0.22f * 3.15f * 0.8f		//流程通用流量
 #define RECLAIM_SAFE_START 10.0f		//取料流程启动时堆场最低当前容量
 
 Flow::Flow()
@@ -358,6 +358,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 				train.lose_focus();
 				yard.lose_focus();
 				silo.lose_focus();
+				web.lose_focus();
 			}
 			ImGui::SameLine();
 			temp = it->flow_state == 1 && it->scene_ready == false;
@@ -729,9 +730,9 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 					this->windowGroundChoose = false;
 					this->groundSelected = false;
 					//皮带变蓝色
-					conv.shutDown(stoi(it->flow_name));
+					//conv.shutDown(stoi(it->flow_name));
 					//斗轮机变红色
-					wheel.shutDown(it->equipments);
+					//wheel.shutDown(it->equipments);
 					//泊位设备变红色
 					berth.unloader_shutDown(it->equipments);
 					//装车楼变红色
@@ -754,7 +755,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 				}
 			}
 			ImGui::SameLine();
-			temp = it->flow_state == 1 && conv.cancelCheck(it->equipments) && web.cancelCheck(it->equipments);
+			temp = it->flow_state == 1/* && conv.cancelCheck(it->equipments)*/ && web.cancelCheck(it->equipments);
 			this->setText(temp);
 			if (ImGui::Button(u8"流程取消"))//仅在state=1且对应皮带状态全部变成蓝色时有效
 			{
@@ -847,7 +848,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 			{
 				for (int j = 0; j < 8; j++)
 				{
-					this->showButton(*it, conv, wheel, berth, train, yard, silo);
+					this->showButton(*it, conv, wheel, berth, train, yard, silo, web);
 					if (j != 7)
 					{
 						ImGui::SameLine();
@@ -864,7 +865,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 			std::vector<FlowAttrib>::iterator it = std::find_if(this->flows.begin(), this->flows.end(), Myfind2());
 			for (int i = 0; i < 4; i++)
 			{
-				this->showButton(*it, conv, wheel, berth, train, yard, silo);
+				this->showButton(*it, conv, wheel, berth, train, yard, silo, web);
 				if (i != 3)
 				{
 					ImGui::SameLine();
@@ -880,7 +881,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 			std::vector<FlowAttrib>::iterator it = std::find_if(this->flows.begin(), this->flows.end(), Myfind3());
 			for (int i = 0; i < 2; i++)
 			{
-				this->showButton(*it, conv, wheel, berth, train, yard, silo);
+				this->showButton(*it, conv, wheel, berth, train, yard, silo, web);
 				if (i == 0)
 				{
 					ImGui::SameLine();
@@ -894,7 +895,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 		{
 			ImGui::Indent();
 			std::vector<FlowAttrib>::iterator it = std::find_if(this->flows.begin(), this->flows.end(), Myfind4());
-			this->showButton(*it, conv, wheel, berth, train, yard, silo);
+			this->showButton(*it, conv, wheel, berth, train, yard, silo, web);
 			ImGui::Unindent();
 		}
 		//4号泊位流程，上堆场
@@ -910,7 +911,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 					{
 						break;
 					}
-					this->showButton(*it, conv, wheel, berth, train, yard, silo);
+					this->showButton(*it, conv, wheel, berth, train, yard, silo, web);
 					if (j != 7)
 					{
 						if (i == 3 && j == 5)
@@ -931,7 +932,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 			std::vector<FlowAttrib>::iterator it = std::find_if(this->flows.begin(), this->flows.end(), Myfind6());
 			for (int i = 0; i < 5; i++)
 			{
-				this->showButton(*it, conv, wheel, berth, train, yard, silo);
+				this->showButton(*it, conv, wheel, berth, train, yard, silo, web);
 				if (i != 4)
 				{
 					ImGui::SameLine();
@@ -953,7 +954,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 					{
 						continue;
 					}
-					this->showButton(*it, conv, wheel, berth, train, yard, silo);
+					this->showButton(*it, conv, wheel, berth, train, yard, silo, web);
 					if (it->flow_name == "483")
 					{
 						ImGui::SameLine(338.5f);
@@ -1021,7 +1022,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 	}
 }
 
-void Flow::train_check(Energy& energy, int end_train_1, int end_train_2, Conveyor& conv, SlewingWheel& wheel, TrainLoader& train, Yard& yard)
+void Flow::train_check(Energy& energy, int end_train_1, int end_train_2, TrainLoader& train, Yard& yard, Web& web)
 {
 	if (end_train_1 == 1 || end_train_2 == 1)
 	{
@@ -1031,15 +1032,17 @@ void Flow::train_check(Energy& energy, int end_train_1, int end_train_2, Conveyo
 			if ((it->flow_idx > 92 && it->flow_idx < 96) && it->flow_state == 3)
 			{
 				//皮带变蓝色
-				conv.shutDown(stoi(it->flow_name));
+				//conv.shutDown(stoi(it->flow_name));
 				//斗轮机变红色
-				wheel.shutDown(it->equipments);
+				//wheel.shutDown(it->equipments);
 				//装车楼变红色
 				train.shutDown(it->equipments);
 				//堆场停止
 				yard.yard_end(it->equipments);
 				//转热备
 				energy.hotEnd(it->equipments);
+				//物流网终止
+				web.end_flow(it->equipments);
 				//按钮变红色
 				it->flow_state = 1;
 			}
@@ -1053,15 +1056,17 @@ void Flow::train_check(Energy& energy, int end_train_1, int end_train_2, Conveyo
 			if ((it->flow_idx > 95 && it->flow_idx < 98) && it->flow_state == 3)
 			{
 				//皮带变蓝色
-				conv.shutDown(stoi(it->flow_name));
+				//conv.shutDown(stoi(it->flow_name));
 				//斗轮机变红色
-				wheel.shutDown(it->equipments);
+				//wheel.shutDown(it->equipments);
 				//装车楼变红色
 				train.shutDown(it->equipments);
 				//堆场停止
 				yard.yard_end(it->equipments);
 				//转热备
 				energy.hotEnd(it->equipments);
+				//物流网终止
+				web.end_flow(it->equipments);
 				//按钮变红色
 				it->flow_state = 1;
 			}
@@ -1069,7 +1074,7 @@ void Flow::train_check(Energy& energy, int end_train_1, int end_train_2, Conveyo
 	}
 }
 
-void Flow::stop_yard_flow(Energy& energy, std::string name_wheel, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Silo& silo)
+void Flow::stop_yard_flow(Energy& energy, std::string name_wheel, Berth& berth, TrainLoader& train, Silo& silo, Web& web)
 {
 	for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
 	{
@@ -1081,9 +1086,9 @@ void Flow::stop_yard_flow(Energy& energy, std::string name_wheel, Conveyor& conv
 				{
 					//终止流程
 					//皮带变蓝色
-					conv.shutDown(stoi(it1->flow_name));
+					//conv.shutDown(stoi(it1->flow_name));
 					//斗轮机变红色
-					wheel.shutDown(it1->equipments);
+					//wheel.shutDown(it1->equipments);
 					//泊位设备变红色
 					berth.unloader_shutDown(it1->equipments);
 					//装车楼变红色
@@ -1092,6 +1097,8 @@ void Flow::stop_yard_flow(Energy& energy, std::string name_wheel, Conveyor& conv
 					silo.end_silo(it1->equipments);
 					//转热备
 					energy.hotEnd(it1->equipments);
+					//物流网终止
+					web.end_flow(it1->equipments);
 					it1->flow_state = 1;
 					break;
 				}
@@ -1100,7 +1107,7 @@ void Flow::stop_yard_flow(Energy& energy, std::string name_wheel, Conveyor& conv
 	}
 }
 
-void Flow::stop_silo_flow(Energy& energy, Conveyor& conv, SlewingWheel& wheel, Yard& yard)
+void Flow::stop_silo_flow(Energy& energy, Yard& yard, Web& web)
 {
 	for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
 	{
@@ -1110,13 +1117,15 @@ void Flow::stop_silo_flow(Energy& energy, Conveyor& conv, SlewingWheel& wheel, Y
 			if (*it2 == "ZW12")
 			{
 				//皮带变蓝色
-				conv.shutDown(stoi(it1->flow_name));
+				//conv.shutDown(stoi(it1->flow_name));
 				//斗轮机变红色
-				wheel.shutDown(it1->equipments);
+				//wheel.shutDown(it1->equipments);
 				//堆场停止
 				yard.yard_end(it1->equipments);
 				//转热备
 				energy.hotEnd(it1->equipments);
+				//物流网终止
+				web.end_flow(it1->equipments);
 				it1->flow_state = 1;
 				break;
 			}
@@ -1124,7 +1133,7 @@ void Flow::stop_silo_flow(Energy& energy, Conveyor& conv, SlewingWheel& wheel, Y
 	}
 }
 
-void Flow::ship_leave(Energy& energy, int berth_idx, Conveyor& conv, SlewingWheel& wheel, Yard& yard)
+void Flow::ship_leave(Energy& energy, int berth_idx, Yard& yard, Web& web)
 {
 	//对应泊位流程空载运行
 	switch (berth_idx)
@@ -1137,13 +1146,15 @@ void Flow::ship_leave(Energy& energy, int berth_idx, Conveyor& conv, SlewingWhee
 			{
 				it1->flow_state = 2;
 				//皮带变蓝色
-				conv.shutDown(stoi(it1->flow_name));
+				//conv.shutDown(stoi(it1->flow_name));
 				//斗轮机变红色
-				wheel.shutDown(it1->equipments);
+				//wheel.shutDown(it1->equipments);
 				//堆场停止
 				yard.yard_end(it1->equipments);
 				//转热备
 				energy.hotEnd(it1->equipments);
+				//物流网终止
+				web.end_flow(it1->equipments);
 			}
 		}
 		break;
@@ -1155,13 +1166,15 @@ void Flow::ship_leave(Energy& energy, int berth_idx, Conveyor& conv, SlewingWhee
 			{
 				it1->flow_state = 2;
 				//皮带变蓝色
-				conv.shutDown(stoi(it1->flow_name));
+				//conv.shutDown(stoi(it1->flow_name));
 				//斗轮机变红色
-				wheel.shutDown(it1->equipments);
+				//wheel.shutDown(it1->equipments);
 				//堆场停止
 				yard.yard_end(it1->equipments);
 				//转热备
 				energy.hotEnd(it1->equipments);
+				//物流网终止
+				web.end_flow(it1->equipments);
 			}
 		}
 		break;
@@ -1173,13 +1186,15 @@ void Flow::ship_leave(Energy& energy, int berth_idx, Conveyor& conv, SlewingWhee
 			{
 				it1->flow_state = 2;
 				//皮带变蓝色
-				conv.shutDown(stoi(it1->flow_name));
+				//conv.shutDown(stoi(it1->flow_name));
 				//斗轮机变红色
-				wheel.shutDown(it1->equipments);
+				//wheel.shutDown(it1->equipments);
 				//堆场停止
 				yard.yard_end(it1->equipments);
 				//转热备
 				energy.hotEnd(it1->equipments);
+				//物流网终止
+				web.end_flow(it1->equipments);
 			}
 		}
 		break;
@@ -1191,13 +1206,15 @@ void Flow::ship_leave(Energy& energy, int berth_idx, Conveyor& conv, SlewingWhee
 			{
 				it1->flow_state = 2;
 				//皮带变蓝色
-				conv.shutDown(stoi(it1->flow_name));
+				//conv.shutDown(stoi(it1->flow_name));
 				//斗轮机变红色
-				wheel.shutDown(it1->equipments);
+				//wheel.shutDown(it1->equipments);
 				//堆场停止
 				yard.yard_end(it1->equipments);
 				//转热备
 				energy.hotEnd(it1->equipments);
+				//物流网终止
+				web.end_flow(it1->equipments);
 			}
 		}
 		break;
@@ -1209,9 +1226,11 @@ void Flow::ship_leave(Energy& energy, int berth_idx, Conveyor& conv, SlewingWhee
 			{
 				it1->flow_state = 2;
 				//皮带变蓝色
-				conv.shutDown(stoi(it1->flow_name));
+				//conv.shutDown(stoi(it1->flow_name));
 				//转热备
 				energy.hotEnd(it1->equipments);
+				//物流网终止
+				web.end_flow(it1->equipments);
 			}
 		}
 		break;
@@ -1220,7 +1239,7 @@ void Flow::ship_leave(Energy& energy, int berth_idx, Conveyor& conv, SlewingWhee
 	}
 }
 
-void Flow::end_shiploading(Energy& energy, Conveyor& conv, Berth& berth)
+void Flow::end_shiploading(Energy& energy, Berth& berth, Web& web)
 {
 	for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
 	{
@@ -1228,11 +1247,13 @@ void Flow::end_shiploading(Energy& energy, Conveyor& conv, Berth& berth)
 		{
 			it1->flow_state = 1;
 			//皮带变浅绿色
-			conv.run_unloaded(it1->equipments);
+			//conv.run_unloaded(it1->equipments);
 			//泊位设备变红色
 			berth.unloader_shutDown(it1->equipments);
 			//转热备
 			energy.hotEnd(it1->equipments);
+			//物流网终止
+			web.end_flow(it1->equipments);
 			break;
 		}
 	}
@@ -1286,7 +1307,7 @@ void Flow::end_shipunloading(Message& message, Energy& energy, int berth_finishe
 	}
 }
 
-void Flow::trip_end(bool all, std::vector<std::string> equipments, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo)
+void Flow::trip_end(bool all, std::vector<std::string> equipments, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web)
 {
 	if (all)
 	{
@@ -1307,6 +1328,8 @@ void Flow::trip_end(bool all, std::vector<std::string> equipments, Conveyor& con
 				yard.yard_end(it1->equipments);
 				//筒仓停止
 				silo.end_silo(it1->equipments);
+				//物流网急停
+				web.emergencyShutDown(it1->equipments);
 				it1->flow_state = 0;
 				it1->scene_ready = false;
 			}
@@ -1336,6 +1359,8 @@ void Flow::trip_end(bool all, std::vector<std::string> equipments, Conveyor& con
 							yard.yard_end(it1->equipments);
 							//筒仓停止
 							silo.end_silo(it1->equipments);
+							//物流网急停
+							web.emergencyShutDown(it1->equipments);
 							it1->flow_state = 0;
 							it1->scene_ready = false;
 							break;
@@ -1343,6 +1368,19 @@ void Flow::trip_end(bool all, std::vector<std::string> equipments, Conveyor& con
 					}
 				}
 			}
+		}
+	}
+}
+
+void Flow::end_web(Conveyor& conv, SlewingWheel& wheel, std::string finishEndName)
+{
+	for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
+	{
+		if (it1->flow_state == 1 && *it1->equipments.rbegin() == finishEndName)
+		{
+			conv.cancel_web(stoi(it1->flow_name));
+			wheel.shutDown(it1->equipments);
+			break;
 		}
 	}
 }
@@ -1359,7 +1397,7 @@ void Flow::setText(bool temp)
 	}
 }
 
-void Flow::showButton(FlowAttrib& flow, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo)
+void Flow::showButton(FlowAttrib& flow, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web)
 {
 	//流程状态，0白色未启用，1红色流程被选中等待现场就绪，2绿色正常运行
 	this->style->Colors[ImGuiCol_Text] = ImColor(0, 0, 0, 255);
@@ -1383,13 +1421,13 @@ void Flow::showButton(FlowAttrib& flow, Conveyor& conv, SlewingWheel& wheel, Ber
 	}
 	if (ImGui::Button((flow.flow_name + u8" 流程").c_str()))
 	{
-		this->pressButton(flow, conv, wheel, berth, train, yard, silo);
+		this->pressButton(flow, conv, wheel, berth, train, yard, silo, web);
 	}
 	this->style->Colors[ImGuiCol_Text] = ImColor(255, 255, 255, 255);
 	this->style->Colors[ImGuiCol_Button] = ImColor(200, 200, 200, 255);
 }
 
-void Flow::pressButton(FlowAttrib& flow, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo)
+void Flow::pressButton(FlowAttrib& flow, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web)
 {
 	if (this->onfocus != flow.flow_idx)
 	{
@@ -1400,6 +1438,7 @@ void Flow::pressButton(FlowAttrib& flow, Conveyor& conv, SlewingWheel& wheel, Be
 		yard.set_focus(flow.equipments);
 		silo.set_focus(flow.equipments);
 		berth.set_focus(flow.equipments);
+		web.set_focus(flow.equipments);
 	}
 	else
 	{
@@ -1410,5 +1449,6 @@ void Flow::pressButton(FlowAttrib& flow, Conveyor& conv, SlewingWheel& wheel, Be
 		yard.lose_focus();
 		silo.lose_focus();
 		berth.lose_focus();
+		web.lose_focus();
 	}
 }

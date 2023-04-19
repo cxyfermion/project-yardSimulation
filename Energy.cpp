@@ -265,7 +265,7 @@ void Energy::reset()
 	}
 }
 
-void Energy::update(Message& message, float simurate, double deltaTime)
+void Energy::update(Message& message, float simurate, float gapTime)
 {
 	for (std::vector<Transformer>::iterator it1 = this->transformers.begin(); it1 != this->transformers.end(); it1++)
 	{
@@ -275,20 +275,20 @@ void Energy::update(Message& message, float simurate, double deltaTime)
 			if (it2->state == 2)
 			{
 				//运行状态
-				it2->time += (float)(simurate * deltaTime);
+				it2->time += (float)(simurate * gapTime);
 				//注意@的处理
 				if (*it2->equipment.begin() != '@')
 				{
 					if (it2->pow_rate < 1.0f)
 					{
-						it2->pow_rate += POW_INCREASING * simurate;
-						it1->cur_pow += it2->pow * POW_INCREASING * simurate;
+						it2->pow_rate += POW_INCREASING * simurate * gapTime;
+						it1->cur_pow += it2->pow * POW_INCREASING * simurate * gapTime;
 					}
 					else if (it2->pow_rate > 1.0f)
 					{
 						it2->pow_rate = 1.0f;
 					}
-					it1->cur_energy += (float)(simurate * deltaTime) * it2->pow * it2->transformation_ratio * 0.001f;
+					it1->cur_energy += (float)(simurate * gapTime) * it2->pow * it2->transformation_ratio * 0.001f;
 				}
 			}
 		}

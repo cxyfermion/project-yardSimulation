@@ -67,7 +67,7 @@ int Console::init()
 	glfwMakeContextCurrent(this->window);
 	glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
 	glfwSetCursorPosCallback(this->window, mouse_cursor_posotion);
-	glfwSetScrollCallback(this->window, mouse_scroll_posotion);
+	//glfwSetScrollCallback(this->window, mouse_scroll_posotion);
 	//以下语句用于不显示鼠标
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -110,6 +110,7 @@ void Console::run()
 	Shader trainShader("res/Shaders/Shader_for_2D/shader_train_2d.vert", "res/Shaders/Shader_for_2D/shader_train_2d.frag", "res/Shaders/Shader_for_2D/shader_train_2d.geom");
 	Shader yardShader("res/Shaders/Shader_for_2D/shader_yard_2d.vert", "res/Shaders/Shader_for_2D/shader_yard_2d.frag", "res/Shaders/Shader_for_2D/shader_yard_2d.geom");
 	Shader siloShader("res/Shaders/Shader_for_2D/shader_silo_2d.vert", "res/Shaders/Shader_for_2D/shader_silo_2d.frag", "res/Shaders/Shader_for_2D/shader_silo_2d.geom");
+	Shader fragsShader("res/Shaders/Shader_for_2D/shader_frags_2d.vert", "res/Shaders/Shader_for_2D/shader_frags_2d.frag", "res/Shaders/Shader_for_2D/shader_frags_2d.geom");
 
 	//状态初始化
 	if (this->random_initiating)
@@ -154,37 +155,46 @@ void Console::run()
 		//更新状态
 		simucore.updateTime();
 		env.updateEnv();
-		if (!simucore.simu_pause || simucore.stepping)
+		if ((!simucore.simu_pause && simucore.freshRequire) || simucore.stepping)
 		{
-			conv.updateConvs(simucore.run_rate);
-			berth.updateBuckets(simucore.run_rate);
+			conv.updateConvs((float)simucore.freshGapTime, simucore.run_rate, web.convAmount);
+			berth.updateBuckets((float)simucore.freshGapTime, simucore.run_rate);
 			if (berth.berth_finished != -1)
 			{
 				//船舶卸空结束
 				flow.end_shipunloading(message, energy, berth.berth_finished, conv, wheel, berth, yard);
 			}
-			int ret_ship = berth.updateShips(simucore.run_rate);
+			int ret_ship = berth.updateShips((float)simucore.freshGapTime, simucore.run_rate);
 			if (ret_ship == 1)
 			{
 				//装船装满结束
-				flow.end_shiploading(energy, conv, berth);
+				flow.end_shiploading(energy, berth, web);
 			}
-			end_train_1 = train.updateTrains(simucore.run_rate);
-			if (yard.updateYards(simucore.run_rate))
+			end_train_1 = train.updateTrains((float)simucore.freshGapTime, simucore.run_rate);
+			if (yard.updateYards((float)simucore.freshGapTime, simucore.run_rate))
 			{
-				flow.stop_yard_flow(energy, yard.terminate_wheel, conv, wheel, berth, train, silo);
+				flow.stop_yard_flow(energy, yard.terminate_wheel, berth, train, silo, web);
 			}
-			silo.updateStraight(simucore.run_rate);
-			if (silo.updateSilos(simucore.run_rate))
+			silo.updateStraight((float)simucore.freshGapTime, simucore.run_rate);
+			if (silo.updateSilos((float)simucore.freshGapTime, simucore.run_rate))
 			{
-				flow.stop_silo_flow(energy, conv, wheel, yard);
+				flow.stop_silo_flow(energy, yard, web);
 			}
-			web.update(simucore, simucore.run_rate);
-			energy.update(message, simucore.run_rate, simucore.simu_deltaTime);
+			web.update(simucore, (float)simucore.freshGapTime, simucore.run_rate);	//急停后死循环
+			if (web.finishEndName != "NULL")
+			{
+				flow.end_web(conv, wheel, web.finishEndName);
+			}
+			energy.update(message, simucore.run_rate, (float)simucore.freshGapTime);
 			if (energy.trip != -1)
 			{
 				//变压器跳闸
-				flow.trip_end(energy.trip == 0, energy.getEquipments(), conv, wheel, berth, train, yard, silo);
+				flow.trip_end(energy.trip == 0, energy.getEquipments(), conv, wheel, berth, train, yard, silo, web);
+			}
+			//刷新复位
+			if (simucore.freshRequire)
+			{
+				simucore.freshRequire = false;
 			}
 			//步进修正
 			if (simucore.stepping)
@@ -218,6 +228,7 @@ void Console::run()
 		train.drawTrain(camera, trainShader);
 		yard.drawYard(camera, yardShader);
 		silo.drawSilo(camera, siloShader);
+		web.drawFrags(camera, fragsShader);
 		//start new frame for imGUI
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -252,7 +263,7 @@ void Console::run()
 					if (ship_berth != -1)
 					{
 						//船舶离港中断
-						flow.ship_leave(energy, ship_berth, conv, wheel, yard);
+						flow.ship_leave(energy, ship_berth, yard, web);
 					}
 				}
 				if (this->compitence == 1 || this->compitence == 10 || this->compitence == 12)
@@ -294,7 +305,7 @@ void Console::run()
 		//末尾处理
 		if (end_train_1 || end_train_2)
 		{
-			flow.train_check(energy, end_train_1, end_train_2, conv, wheel, train, yard);
+			flow.train_check(energy, end_train_1, end_train_2, train, yard, web);
 		}
 		glfwSwapBuffers(window);
 		glfwPollEvents();

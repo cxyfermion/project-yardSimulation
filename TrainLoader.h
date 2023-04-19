@@ -81,7 +81,7 @@ public:
 	void drawTrain(Camera& camera, Shader& trainShader);
 	void initGuiStyle();														//样式初始化
 	int train_dispatch(Message& message);									//ImGui火车调度控制台
-	int updateTrains(float simurate);										//火车状态
+	int updateTrains(float gapTime, float simurate);						//火车状态
 	void add_type(std::string str_name, int type_type);					//添加货物新类
 	bool run(std::vector<std::string>& equipments, int type, int index);	//负载运行，返回true操作成功（双道都有车优先装早进港等待的车），返回false车道上没有车，无法启动
 	void shutDown(std::vector<std::string>& equipments);					//流程停止

@@ -110,8 +110,8 @@ public:
 	void initGuiStyle();																		//样式初始化
 	int ship_dispatch(Message& message);													//船舶调度控制台，返回需要流程停止的泊位序号
 	void unloader_dispatch();																//卸船机调度台
-	void updateBuckets(float simurate);														//更新抓斗状态
-	int updateShips(float simurate);														//更新船只状态，返回1为装船装满结束
+	void updateBuckets(float gapTime, float simurate);										//更新抓斗状态
+	int updateShips(float gapTime, float simurate);											//更新船只状态，返回1为装船装满结束
 	void add_type(std::string str_name, int type_type);									//添加货物新类
 	bool set_unloading_ship(Message& message, std::vector<std::string>& equipments);		//卸船机卸船准备检查，返回false为开始失败
 	bool set_loading_ship(Message& message, int load_type, int load_index);				//装船机装船准备检查，返回false为装船启动失败
@@ -156,7 +156,7 @@ private:
 	int get_ship_type(float total_storage);						//判定船舶吨位：0为5千吨，1为2万吨，2为3.5万吨，3为5万吨，4为6.5万吨
 	float get_ship_level(float total_storage);						//判定船舶吨位：0.7为5千吨，0.9为2万吨，1.1为3.5万吨，1.3为5万吨，1.5为6.5万吨
 	bool type_check(int type, int index);							//检查是否存在相应货物类的定义，返回true表示存在定义
-	void bucket_unload(float simurate, ShipUnloader& unloader);	//抓斗下行过程中减少对应门机泊位船舶的当前载货量
+	void bucket_unload(float gapTime, float simurate, ShipUnloader& unloader);	//抓斗下行过程中减少对应门机泊位船舶的当前载货量
 	void pre_button();
 	void post_button();
 

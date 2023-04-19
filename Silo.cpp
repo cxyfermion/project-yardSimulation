@@ -291,7 +291,7 @@ bool Silo::start_stack(int silo_index, bool type, float amount, float flux)
 	return ret;
 }
 
-bool Silo::updateSilos(float simurate)
+bool Silo::updateSilos(float gapTime, float simurate)
 {
 	bool ret = false;
 	//Í²²Ö¸üÐÂ
@@ -299,7 +299,7 @@ bool Silo::updateSilos(float simurate)
 	{
 		if (it1->silo_state_up == 1)
 		{
-			it1->cur_storage += it1->silo_flux * simurate;
+			it1->cur_storage += it1->silo_flux * gapTime * simurate;
 			it1->silo_coords[5] = (float)it1->cur_storage / (float)it1->max_storage;
 			if (it1->cur_storage > it1->max_storage)
 			{
@@ -319,15 +319,15 @@ bool Silo::updateSilos(float simurate)
 		}
 		else if (it1->silo_state_down == 1)
 		{
-			it1->cur_storage -= it1->silo_flux * simurate;
+			it1->cur_storage -= it1->silo_flux * gapTime * simurate;
 			it1->silo_coords[5] = (float)it1->cur_storage / (float)it1->max_storage;
 			if (it1->silo_type)
 			{
-				this->out_total_1 += (int)(it1->silo_flux * simurate);
+				this->out_total_1 += (int)(it1->silo_flux * gapTime * simurate);
 			}
 			else
 			{
-				this->out_total_0 += (int)(it1->silo_flux * simurate);
+				this->out_total_0 += (int)(it1->silo_flux * gapTime * simurate);
 			}
 			//Ð¶¿ÕÍ£»ú
 			if (it1->cur_storage < 0.0f)
@@ -342,15 +342,15 @@ bool Silo::updateSilos(float simurate)
 	return ret;
 }
 
-void Silo::updateStraight(float simurate)
+void Silo::updateStraight(float gapTime, float simurate)
 {
 	if (this->straight_state = 1)
 	{
-		this->out_total_0 += (int)(this->straight_flux * simurate);
+		this->out_total_0 += (int)(this->straight_flux * gapTime * simurate);
 	}
 	else if (this->straight_state = 2)
 	{
-		this->out_total_1 += (int)(this->straight_flux * simurate);
+		this->out_total_1 += (int)(this->straight_flux * gapTime * simurate);
 	}
 }
 

@@ -7,14 +7,14 @@
 #define THRESH_NORTH 660				//列车显示北限
 #define THRESH_SOUTH 2000			//列车显示南限
 
-#define SPEED_TRAIN_LOAD 0.0008f		//火车装车速度
-#define SPEED_TRAIN_LEAVE 0.002f		//火车离港速度
+#define SPEED_TRAIN_LOAD 0.008f		//火车装车速度
+#define SPEED_TRAIN_LEAVE 0.02f		//火车离港速度
 #define BIAS_X 100						//装车楼x坐标右偏移值
 #define TRAIN_BIAS_X 100				//火车向装车楼中心x坐标偏移值
 #define WAGON_LENGTH 400				//单节车皮长度
 #define LAYER_building 0.0050f		//装车楼图层
 #define LAYER_train 0.0040f			//火车图层
-#define LOAD_SPEED 0.3f				//装车楼装车速度
+#define LOAD_SPEED 3.0f				//装车楼装车速度
 
 #define PROB_TRAIN 0.5f				//车道有火车的概率
 
@@ -616,7 +616,7 @@ int TrainLoader::train_dispatch(Message& message)
 	return end;
 }
 
-int TrainLoader::updateTrains(float simurate)
+int TrainLoader::updateTrains(float gapTime, float simurate)
 {
 	int end = 0;
 	for (std::vector<TrainAttrib>::iterator it1 = this->trains.begin(); it1 != this->trains.end(); )
@@ -638,7 +638,7 @@ int TrainLoader::updateTrains(float simurate)
 				{
 					//未到达装车楼下方，减速前进
 					it1->speed_train = SPEED_TRAIN_LOAD + (it1->first_pos - this->length_wagon / 2 - this->building_coords_B[1]) * (SPEED_TRAIN_LEAVE - SPEED_TRAIN_LOAD) / 2.0f;
-					it1->first_pos -= it1->speed_train * simurate;
+					it1->first_pos -= it1->speed_train * gapTime *simurate;
 				}
 				else
 				{
@@ -652,13 +652,13 @@ int TrainLoader::updateTrains(float simurate)
 							//当前正在装货编号
 							if (it2->amount < it1->max_per_wagon)
 							{
-								it2->amount += LOAD_SPEED * simurate;
+								it2->amount += LOAD_SPEED * gapTime * simurate;
 								it1->train_coords[4] = (1.0f - it2->amount / it1->max_per_wagon);
 							}
 							break;
 						}
 					}
-					it1->first_pos -= it1->speed_train * simurate;
+					it1->first_pos -= it1->speed_train * gapTime * simurate;
 					if (it1->first_pos + this->length_wagon * ((float)it1->total_num + 0.5f) < this->building_coords_B[1])
 					{
 						//火车驶过装车楼，装车结束
@@ -677,7 +677,7 @@ int TrainLoader::updateTrains(float simurate)
 				{
 					//未到达装车楼下方，减速前进
 					it1->speed_train = SPEED_TRAIN_LOAD + (it1->first_pos - this->length_wagon / 2 - this->building_coords_A[1]) * (SPEED_TRAIN_LEAVE - SPEED_TRAIN_LOAD) / 2.0f;
-					it1->first_pos -= it1->speed_train * simurate;
+					it1->first_pos -= it1->speed_train * gapTime * simurate;
 				}
 				else
 				{
@@ -691,13 +691,13 @@ int TrainLoader::updateTrains(float simurate)
 							//当前正在装货编号
 							if (it2->amount < it1->max_per_wagon)
 							{
-								it2->amount += LOAD_SPEED * simurate;
+								it2->amount += LOAD_SPEED * gapTime * simurate;
 								it1->train_coords[4] = (1.0f - it2->amount / it1->max_per_wagon);
 							}
 							break;
 						}
 					}
-					it1->first_pos -= it1->speed_train * simurate;
+					it1->first_pos -= it1->speed_train * gapTime * simurate;
 					if (it1->first_pos + this->length_wagon * ((float)it1->total_num + 0.5f) < this->building_coords_A[1])
 					{
 						//火车驶过装车楼，装车结束
@@ -714,7 +714,7 @@ int TrainLoader::updateTrains(float simurate)
 		{
 			//正在离港
 			it1->speed_train += 0.00005f;
-			it1->first_pos -= it1->speed_train * simurate;
+			it1->first_pos -= it1->speed_train * gapTime * simurate;
 			if (it1->first_pos + this->length_wagon * ((float)it1->total_num + 0.5f) < this->south_thresh)
 			{
 				//火车离开视线，消失

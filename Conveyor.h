@@ -74,7 +74,7 @@ public:
 	void draw(Camera& camera, Shader& convShader, float value);									//绘制
 	void initGuiStyle();																				//样式初始化
 	void conv_dispatch(bool unreal);																//流程状态显示
-	void updateConvs(float simurate);																//更新皮带
+	void updateConvs(float gapTime, float simurate, float convAmount[51]);							//更新皮带
 	void add_type(std::string str_name, int type_type);											//添加货物新类
 	bool startCheck(std::vector<std::string>& equipments);											//检查传入的设备代号容器是否都空闲且物料输送请求一致，返回false为禁止启动，返回true为允许启动
 	bool sceneCheck(std::vector<std::string>& equipments);											//现场检查
@@ -83,7 +83,8 @@ public:
 	void run_loaded(int index_flow, int type, int index, std::vector<std::string>& equipments);	//负载运行
 	void shutDown(int index_flow);																	//流程停止
 	void cancel(std::vector<std::string>& equipments);												//流程取消
-	bool cancelCheck(std::vector<std::string>& equipments);											//流程取消检查，返回true表示允许取消本流程
+	void cancel_web(int index_flow);																//流程变为蓝色（取消之后一段事件，传入自web文件）
+	//bool cancelCheck(std::vector<std::string>& equipments);											//流程取消检查，返回true表示允许取消本流程
 	void emergency_shutDown(int index_flow, std::vector<std::string>& equipments);				//流程急停
 	void set_focus(std::vector<std::string>& equipments);											//选中流程的显示
 	void lose_focus();																				//失焦后的流程显示

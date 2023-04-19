@@ -37,6 +37,7 @@ public:
 	float MovementSpeed;
 	float MouseSensitivity;
 	float Zoom;
+	float shiftMode;
 	Camera(glm::vec3 position = glm::vec3(0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH)
 		: Front(glm::vec3(0.0f, 0.0f, -1.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
 	{
@@ -44,6 +45,7 @@ public:
 		this->WorldUp = up;
 		this->Yaw = yaw;
 		this->Pitch = pitch;
+		this->shiftMode = 1.0f;
 		updateCameraVectors();
 	}
 	glm::mat4 GetViewMatrix()
@@ -72,32 +74,51 @@ public:
 		const float velocity = this->MovementSpeed * deltaTime;
 		if (direction == FORWARD)
 		{
-			Position += Front * velocity;
+			Position += Front * velocity * this->shiftMode;
 		}
 		if (direction == BACKWARD)
 		{
-			Position -= Front * velocity;
+			Position -= Front * velocity * this->shiftMode;
 		}
 		if (direction == RIGHT)
 		{
-			Position += Right * velocity;
+			Position += Right * velocity * this->shiftMode;
 		}
 		if (direction == LEFT)
 		{
-			Position -= Right * velocity;
+			Position -= Right * velocity * this->shiftMode;
 		}
 		if (direction == UP)
 		{
-			Position += Up * velocity;
+			Position += Up * velocity * this->shiftMode;
 		}
 		if (direction == DOWN)
 		{
-			Position -= Up * velocity;
+			Position -= Up * velocity * this->shiftMode;
 		}
 	}
 	void ProcessMouseScroll(float yoffset)
 	{
 		this->Zoom -= (float)(yoffset * 3.0);
+		if (this->Zoom < 1.0f)
+		{
+			this->Zoom = 1.0f;
+		}
+		if (this->Zoom > 75.0f)
+		{
+			this->Zoom = 75.0f;
+		}
+	}
+	void ProcessView(bool direction)
+	{
+		if (direction)
+		{
+			this->Zoom -= 0.1f * this->shiftMode;
+		}
+		else
+		{
+			this->Zoom += 0.1f * this->shiftMode;
+		}
 		if (this->Zoom < 1.0f)
 		{
 			this->Zoom = 1.0f;

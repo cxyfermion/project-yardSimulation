@@ -46,7 +46,7 @@ class Energy
 public:
 	Energy();
 	void reset();															//重置
-	void update(Message& message, float simurate, double deltaTime);		//更新状态
+	void update(Message& message, float simurate, float gapTime);			//更新状态
 	void coldStart(std::vector<std::string>& equipments);					//从冷备状态变为热备状态
 	void hotStart(std::vector<std::string>& equipments);					//从热备状态变为运行状态
 	void hotEnd(std::vector<std::string>& equipments);						//从运行状态变为热备状态

@@ -132,16 +132,16 @@ public:
 	void drawYard(Camera& camera, Shader& yardShader);
 	void initGuiStyle();								//样式初始化
 	void yard_dispatch(Message& message, bool unreal);				//ImGui堆场状态控制台：可以添加新的货物品种，获取堆场当前状态信息，参数为true表示有强制指定权
-	void add_type(std::string str_name, int type_type);		//添加货物新类
+	void add_type(std::string str_name, int type_type);			//添加货物新类
 	bool start_stack(Message& message, std::vector<std::string>& equipments, int yard, int child, int type, int index, float amount, float flux);	//开始堆料，参数为堆场号，子场号，货物类，申请堆量，流量。返回false为堆料申请失败
 	bool start_reclaim(Message& message, std::vector<std::string>& equipments, int yard, int child, int type, int index, float flux);				//开始取料，返回false为取料申请失败
-	void yard_end(std::vector<std::string>& equipments);		//终止堆场行动（扫描输入设备中的斗轮机，并设置相应堆场为0状态）
-	bool type_check(int type, int index);			//检查是否存在相应货物类的定义，返回true表示存在定义
-	bool updateYards(float simurate);				//返回0，无事；返回1，调取关闭斗轮机代号并终结对应流程
-	void yard_choose(Message& message);								//选择堆场界面
+	void yard_end(std::vector<std::string>& equipments);			//终止堆场行动（扫描输入设备中的斗轮机，并设置相应堆场为0状态）
+	bool type_check(int type, int index);							//检查是否存在相应货物类的定义，返回true表示存在定义
+	bool updateYards(float gapTime, float simurate);				//返回0，无事；返回1，调取关闭斗轮机代号并终结对应流程
+	void yard_choose(Message& message);							//选择堆场界面
 	void set_focus(std::vector<std::string>& equipments);
 	void lose_focus();
-	void send_reset();								//发送信号复位
+	void send_reset();												//发送信号复位
 
 private:
 	int flow_yard_choosed_1;				//由流程选中的堆场1号

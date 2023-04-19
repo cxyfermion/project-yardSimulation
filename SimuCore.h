@@ -37,9 +37,13 @@ public:
 	int runtime_minutes;							//仿真运行时间-分
 	int runtime_hours;								//仿真运行时间-时
 	double simu_deltaTime;
+	bool freshRequire;								//刷新时刻标志位，true表示需要刷新
+	double freshGapTime;							//刷新间隔时间，刷新间隔时间是固定的，不会受仿真速率影响，而仿真时间会受仿真速率影响
 
 private:
-	double simu_lastFrame;
+	int freshGapSwitch;								//刷新间隔时间选择，初始值为50ms（20帧），1表示20ms50FPS，2表示50ms20FPS，3表示100ms10FPS，4表示200ms5FPS，5表示500ms2FPS，6表示1000ms1FPS
+	double curGapTime;								//当前累计刷新时间
+	double simu_lastFrame;							//上一刷新时间记录
 	double terminate_time;							//程序终结时间
 	double terminate_countdown;					//程序终结倒计时
 	int runtime_seconds;							//仿真运行时间-秒

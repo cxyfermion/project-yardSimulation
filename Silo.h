@@ -46,8 +46,8 @@ public:
 	void silo_dispatch(bool unreal);												//ImGui筒仓状态控制台：获取筒仓当前状态信息，参数为true表示有强制指定权
 	void start_straight(float flux, bool type);									//直出部分的流程开启判断,参数0大混，1化工
 	bool start_stack(int silo_index, bool type, float amount, float flux);		//开始堆料，参数为筒仓号，货物类（false为大混煤，true为化工煤），申请堆量，流量。返回false为堆料申请失败
-	bool updateSilos(float simurate);											//返回0，无事；返回1，终结对应流程
-	void updateStraight(float simurate);										//更新直出系统状态
+	bool updateSilos(float gapTime, float simurate);							//返回0，无事；返回1，终结对应流程
+	void updateStraight(float gapTime, float simurate);							//更新直出系统状态
 	void silo_end_out();														//终止筒仓向炼化输出
 	bool out_check();															//返回true，筒仓正在出煤；返回false，筒仓没有出煤
 	void set_focus(std::vector<std::string>& equipments);

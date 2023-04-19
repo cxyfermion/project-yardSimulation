@@ -900,7 +900,7 @@ bool Yard::type_check(int type, int index)
 	return ret;
 }
 
-bool Yard::updateYards(float simurate)
+bool Yard::updateYards(float gapTime, float simurate)
 {
 	bool ret = false;
 	for (std::vector<Yard_father>::iterator it1 = this->yards.begin(); it1 != this->yards.end(); it1++)
@@ -913,7 +913,7 @@ bool Yard::updateYards(float simurate)
 				if (it2->child_state_left == 1)
 				{
 					//堆料
-					it2->child_cur_amount += it2->child_flux_left * simurate;
+					it2->child_cur_amount += it2->child_flux_left * gapTime *simurate;
 					//堆满信号
 					if (it2->child_cur_amount > it2->child_max_amount)
 					{
@@ -927,7 +927,7 @@ bool Yard::updateYards(float simurate)
 				else if (it2->child_state_left == 2)
 				{
 					//取料
-					it2->child_cur_amount -= it2->child_flux_left * simurate;
+					it2->child_cur_amount -= it2->child_flux_left * gapTime * simurate;
 					//取完信号
 					if (it2->child_cur_amount < 0.0f)
 					{
@@ -947,7 +947,7 @@ bool Yard::updateYards(float simurate)
 				if (it2->child_state_left == 1)
 				{
 					//左机堆料
-					it2->child_cur_amount += it2->child_flux_left * simurate;
+					it2->child_cur_amount += it2->child_flux_left * gapTime * simurate;
 					//左机堆满信号
 					if (it2->child_cur_amount > it2->child_max_amount)
 					{
@@ -960,7 +960,7 @@ bool Yard::updateYards(float simurate)
 				else if (it2->child_state_left == 2)
 				{
 					//左机取料
-					it2->child_cur_amount -= it2->child_flux_left * simurate;
+					it2->child_cur_amount -= it2->child_flux_left * gapTime * simurate;
 					//左机取完信号
 					if (it2->child_cur_amount < 0.0f)
 					{
@@ -975,7 +975,7 @@ bool Yard::updateYards(float simurate)
 				if (it2->child_state_right == 1)
 				{
 					//右机堆料
-					it2->child_cur_amount += it2->child_flux_right * simurate;
+					it2->child_cur_amount += it2->child_flux_right * gapTime * simurate;
 					//右机堆满信号
 					if (it2->child_cur_amount > it2->child_max_amount)
 					{
@@ -988,7 +988,7 @@ bool Yard::updateYards(float simurate)
 				else if (it2->child_state_right == 2)
 				{
 					//右机取料
-					it2->child_cur_amount -= it2->child_flux_right * simurate;
+					it2->child_cur_amount -= it2->child_flux_right * gapTime * simurate;
 					//右机取完信号
 					if (it2->child_cur_amount < 0.0f)
 					{

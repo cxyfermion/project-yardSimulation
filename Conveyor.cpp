@@ -8,8 +8,8 @@
 #define SCR_WIDTH 1440
 #define SCR_HEIGHT 810
 
-#define layer_belts 0.0f		//皮带图层
-#define unit_amount 0.220f	//每米皮带装载煤炭重量（吨）
+#define layer_belts 0.0f				//皮带图层
+#define unit_amount 0.220f * 3.15f	//皮带流量：一秒中每米皮带装载煤炭重量（吨）增加值
 
 /*
 string转int：stoi(string)
@@ -59,11 +59,11 @@ Conveyor::Conveyor()
 	info_conv[3] = "BC2B,1640,1335,1640,1915,450,1192";
 	info_conv[4] = "BC3A,1435,1370,1685,1370,110,45";
 	info_conv[5] = "BC3B,1435,1305,1685,1305,110,45";
-	info_conv[6] = "BC4A,1740,1305	,1985,1305,200,205";
+	info_conv[6] = "BC4A,1740,1305,1985,1305,200,205";
 	info_conv[7] = "BC4B,1740,1370,1880,1370,200,205";
 	info_conv[8] = "BC5,1985,1370,2250,1260,110,280";
 	info_conv[9] = "BC6A,1070,1370,1335,1370,185,230";
-	info_conv[10] = "BC6B,1070	,1300,1335,1300,185,230";
+	info_conv[10] = "BC6B,1070,1300,1335,1300,185,230";
 	info_conv[11] = "BC7,750,1370,965,1370,220,235";
 	info_conv[12] = "BC8,2250,900,2250,1230,560,1230";
 	info_conv[13] = "BC9,1930,900,1930,1335,560,1380";
@@ -188,7 +188,7 @@ void Conveyor::draw(Camera& camera, Shader& convShader, float value)
 {
 	convShader.use();
 	//仅画线模式
-	glLineWidth(4.0f);
+	glLineWidth(5.0f);
 	//VBO绑定
 	glBindBuffer(GL_ARRAY_BUFFER, convVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(conv_coords), &conv_coords, GL_STATIC_DRAW);
@@ -355,8 +355,18 @@ void Conveyor::conv_dispatch(bool unreal)
 	}
 }
 
-void Conveyor::updateConvs(float simurate)
+void Conveyor::updateConvs(float gapTime, float simurate, float convAmount[51])
 {
+	for (std::vector<ConvAttrib>::iterator it2 = this->belts.begin(); it2 != this->belts.end(); it2++)
+	{
+		if (it2->conv_state == 3)
+		{
+			this->conv_coords[9 * it2->conv_idx + 5] = 0.0f;
+			this->conv_coords[9 * it2->conv_idx + 6] = 1.0f - 0.6f * convAmount[it2->conv_idx] / it2->conv_max_storage;
+			this->conv_coords[9 * it2->conv_idx + 7] = 0.0f;
+		}
+	}
+	/*
 	for (std::vector<FlowState>::iterator it1 = this->act_flows.begin(); it1 != this->act_flows.end(); )
 	{
 		bool temp = true;
@@ -372,13 +382,13 @@ void Conveyor::updateConvs(float simurate)
 			{
 				continue;
 			}
-			/**/
+			//
 			//无输入模式：上一级满了，本皮带增加装货量；上一级空了，本皮带减少装货量
 			if (empty_begin)
 			{
 				if (flag == 0)
 				{
-					it2->conv_cur_storage -= unit_amount * simurate / 1;
+					it2->conv_cur_storage -= unit_amount * gapTime * simurate;
 					if (it2->conv_cur_storage < 0.0f)
 					{
 						it2->conv_cur_storage = 0.0f;
@@ -386,7 +396,7 @@ void Conveyor::updateConvs(float simurate)
 				}
 				else if (flag == 2)
 				{
-					it2->conv_cur_storage += unit_amount * simurate / 1;
+					it2->conv_cur_storage += unit_amount * gapTime * simurate;
 					if (it2->conv_cur_storage > it2->conv_max_storage)
 					{
 						it2->conv_cur_storage = it2->conv_max_storage;
@@ -398,7 +408,7 @@ void Conveyor::updateConvs(float simurate)
 			{
 				if (flag == 2)
 				{
-					it2->conv_cur_storage += unit_amount * simurate / 1;
+					it2->conv_cur_storage += unit_amount * gapTime * simurate;
 					if (it2->conv_cur_storage > it2->conv_max_storage)
 					{
 						it2->conv_cur_storage = it2->conv_max_storage;
@@ -406,7 +416,7 @@ void Conveyor::updateConvs(float simurate)
 				}
 				else if (flag == 1)
 				{
-					it2->conv_cur_storage -= unit_amount * simurate / 1;
+					it2->conv_cur_storage -= unit_amount * gapTime * simurate;
 					if (it2->conv_cur_storage < 0.0f)
 					{
 						it2->conv_cur_storage = 0.0f;
@@ -425,8 +435,8 @@ void Conveyor::updateConvs(float simurate)
 			{
 				flag = 1;
 			}
-			/**/
-
+			//
+			*/
 			/*
 			//排序皮带后顺序序号一致的皮带会叠在一起，所以在寻找下一个流程的时候需要注意跳过
 			std::vector<ConvAttrib>::iterator it3 = it2;
@@ -485,6 +495,7 @@ void Conveyor::updateConvs(float simurate)
 			}
 			prev = it2->conv_cur_storage > 0.0f;
 			*/
+			/*
 			//更新颜色
 			this->conv_coords[9 * it2->conv_idx + 5] = 0.0f;
 			this->conv_coords[9 * it2->conv_idx + 6] = 1.0f - 0.6f * it2->conv_cur_storage / it2->conv_max_storage;
@@ -522,6 +533,7 @@ void Conveyor::updateConvs(float simurate)
 			it1++;
 		}
 	}
+	*/
 }
 
 void Conveyor::add_type(std::string str_name, int type_type)
@@ -682,22 +694,54 @@ void Conveyor::cancel(std::vector<std::string>& equipments)
 	}
 }
 
-bool Conveyor::cancelCheck(std::vector<std::string>& equipments)
+void Conveyor::cancel_web(int index_flow)
 {
-	bool ret = false;
-	for (std::vector<std::string>::const_iterator it1 = equipments.begin(); it1 != equipments.end(); it1++)
+	//来自web文件中皮带货物运完后的状态改变为蓝色
+	for (std::vector<FlowState>::iterator it1 = this->act_flows.begin(); it1 != this->act_flows.end(); )
 	{
-		for (std::vector<ConvAttrib>::const_iterator it2 = this->belts.begin(); it2 != this->belts.end(); it2++)
+		if (it1->flow_num != index_flow)
 		{
-			if (*it1 == it2->conv_name && it2->conv_state == 1)
-			{
-				ret = true;
-				break;
-			}
+			it1++;
+			continue;
 		}
+		//终结流程，全路皮带变蓝，清空类别和流程标志
+		for (std::vector<ConvAttrib>::iterator it3 = this->belts.begin(); it3 != this->belts.end(); it3++)
+		{
+			if (it3->flow_name != it1->flow_num)
+			{
+				continue;
+			}
+			it3->conv_type = 0;
+			it3->conv_index = 0;
+			it3->flow_name = -1;
+			it3->flow_idx = 100;
+			it3->conv_state = 1;
+			//设置对应颜色
+			this->conv_coords[9 * it3->conv_idx + 5] = 0.0f;
+			this->conv_coords[9 * it3->conv_idx + 6] = 0.0f;
+			this->conv_coords[9 * it3->conv_idx + 7] = 1.0f;
+		}
+		//流程容器去除
+		it1 = this->act_flows.erase(it1);
 	}
-	return ret;
 }
+
+//bool Conveyor::cancelCheck(std::vector<std::string>& equipments)
+//{
+//	bool ret = false;
+//	for (std::vector<std::string>::const_iterator it1 = equipments.begin(); it1 != equipments.end(); it1++)
+//	{
+//		for (std::vector<ConvAttrib>::const_iterator it2 = this->belts.begin(); it2 != this->belts.end(); it2++)
+//		{
+//			if (*it1 == it2->conv_name && it2->conv_state == 1)
+//			{
+//				ret = true;
+//				break;
+//			}
+//		}
+//	}
+//	return ret;
+//}
 
 void Conveyor::emergency_shutDown(int index_flow, std::vector<std::string>& equipments)
 {
