@@ -22,6 +22,7 @@ z = -cos(((hour+minute/60.0)/12.0) * M_PI) * radius
 
 class Environment
 {
+	friend class Record;
 public:
 	Environment();
 	void updateEnv();
@@ -35,10 +36,18 @@ private:
 	glm::mat4 view;
 	glm::mat4 projection;
 	glm::vec3 lightPos;
+	const char* textures[8];
 	float deltaTime;
 	float lastFrame;
-	float circle_radius;					//模拟太阳的移动半径
-	const char* textures[8];
+	float circle_radius;			//模拟太阳的移动半径
+	bool skybox;				//天空盒开关
+	bool background;			//背景开关
+	int texture_act;			//激活的材质
+	int time_mode;				//时间映射模式：0为没有映射，1为使用仿真时间映射，2为本地指定映射
+	int minute_local;			//本地分钟
+	int hour_local;				//本地小时
+	bool light;					//光照开关
+	bool spotlight;				//聚光模式
 	unsigned int cubeVAO, cubeVBO;
 	unsigned int skyboxVAO, skyboxVBO;
 	unsigned int woodTexture;

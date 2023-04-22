@@ -43,6 +43,7 @@ struct Transformer
 
 class Energy
 {
+	friend class Record;
 public:
 	Energy();
 	void reset();															//ÖØÖÃ

@@ -33,6 +33,7 @@ struct Silo_unit
 
 class Silo
 {
+	friend class Record;
 public:
 	Silo();
 	void reset(SimuCore& core, bool rand_init);									//ÖØÖÃ

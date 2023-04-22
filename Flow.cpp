@@ -491,6 +491,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 									//当前泊位无船不允许启动流程，视为不允许空载运行
 									if (berth.set_unloading_ship(message, it->equipments))
 									{
+										yard.flow_num_choose = 0;
 										//斗轮机运行
 										wheel.run(it->equipments, 0);
 										//皮带变深绿色
@@ -542,6 +543,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 									//装车楼启动
 									if (train.run(it->equipments, type, index))
 									{
+										yard.flow_num_choose = 0;
 										//斗轮机运行
 										wheel.run(it->equipments, 1);
 										//皮带变深绿色
@@ -636,6 +638,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 												//启动筒仓
 												if (silo.start_stack(silo_choosed, coal_type, silo.amount_apply, FLUX))
 												{
+													yard.flow_num_choose = 0;
 													//斗轮机运行
 													wheel.run(it->equipments, 1);
 													//皮带变深绿色

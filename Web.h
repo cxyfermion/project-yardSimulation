@@ -85,6 +85,7 @@ public:
 
 class Web
 {
+	friend class Record;
 public:
 	Web();
 	void reset();
@@ -101,8 +102,12 @@ public:
 	bool cancelCheck(std::vector<std::string>& equipments);															//流程取消检查，返回true表示允许取消本流程
 	void set_focus(std::vector<std::string>& equipments);
 	void lose_focus();
-	float convAmount[51];			//皮带当前载货量
-	std::string finishEndName;		//流程结束后终结流程的末尾去向设备名
+	float convAmount[51];				//皮带当前载货量
+	std::string finishEndName;			//流程结束后终结流程的末尾去向设备名
+
+protected:
+	int find_to(std::string toName);	//查找去向设备的节点代号（仅针对Record类开放）
+	std::string find_toName(int idx);	//查找去向设备的设备名（仅针对Record类开放）
 
 private:
 	ImGuiStyle* style;

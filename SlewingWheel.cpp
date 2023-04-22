@@ -79,10 +79,10 @@ void SlewingWheel::reset()
 {
 	for (std::vector<WheelAttrib>::iterator it1 = this->wheels.begin(); it1 != this->wheels.end(); it1++)
 	{
-			it1->wheel_state = 0;
-			this->wheel_coords[7 * it1->wheel_idx + 3] = 1.0f;
-			this->wheel_coords[7 * it1->wheel_idx + 4] = 0.0f;
-			this->wheel_coords[7 * it1->wheel_idx + 5] = 0.0f;
+		it1->wheel_state = 0;
+		this->wheel_coords[7 * it1->wheel_idx + 3] = 1.0f;
+		this->wheel_coords[7 * it1->wheel_idx + 4] = 0.0f;
+		this->wheel_coords[7 * it1->wheel_idx + 5] = 0.0f;
 	}
 }
 

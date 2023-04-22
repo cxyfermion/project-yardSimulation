@@ -68,6 +68,7 @@ public:
 
 class Conveyor
 {
+	friend class Record;
 public:
 	Conveyor();
 	void reset();																					//重置
@@ -81,10 +82,10 @@ public:
 	void run_unloaded(std::vector<std::string>& equipments);										//空载运行
 	bool runCheck(int type, int index, std::vector<std::string>& equipments);						//检查对应的皮带设备中是否存在冲突的货物类，返回false表示不允许启动
 	void run_loaded(int index_flow, int type, int index, std::vector<std::string>& equipments);	//负载运行
-	void shutDown(int index_flow);																	//流程停止
+	//void shutDown(int index_flow);																	//流程停止
 	void cancel(std::vector<std::string>& equipments);												//流程取消
 	void cancel_web(int index_flow);																//流程变为蓝色（取消之后一段事件，传入自web文件）
-	//bool cancelCheck(std::vector<std::string>& equipments);											//流程取消检查，返回true表示允许取消本流程
+	//bool cancelCheck(std::vector<std::string>& equipments);										//流程取消检查，返回true表示允许取消本流程
 	void emergency_shutDown(int index_flow, std::vector<std::string>& equipments);				//流程急停
 	void set_focus(std::vector<std::string>& equipments);											//选中流程的显示
 	void lose_focus();																				//失焦后的流程显示

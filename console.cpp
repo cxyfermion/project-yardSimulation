@@ -80,22 +80,33 @@ int Console::init()
 
 void Console::run()
 {
-	//std::unique_ptr<Conveyor> conv(new Conveyor);
-	//std::unique_ptr<SlewingWheel> wheel(new SlewingWheel);
-	//std::unique_ptr<Flow> flow(new Flow);
-	//std::unique_ptr<Berth> berth(new Berth);
-	Conveyor conv;
-	SlewingWheel wheel;
-	Flow flow;
-	Berth berth;
-	TrainLoader train;
-	Yard yard;
-	Silo silo;
-	SimuCore simucore;
-	Environment env;
-	Energy energy;
-	Message message;
-	Web web;
+	std::unique_ptr<Conveyor> conv(new Conveyor);
+	std::unique_ptr<SlewingWheel> wheel(new SlewingWheel);
+	std::unique_ptr<Flow> flow(new Flow);
+	std::unique_ptr<Berth> berth(new Berth);
+	std::unique_ptr<TrainLoader> train(new TrainLoader);
+	std::unique_ptr<Yard> yard(new Yard);
+	std::unique_ptr<Silo> silo(new Silo);
+	std::unique_ptr<SimuCore> simucore(new SimuCore);
+	std::unique_ptr<Environment> env(new Environment);
+	std::unique_ptr<Energy> energy(new Energy);
+	std::unique_ptr<Message> message(new Message);
+	std::unique_ptr<Web> web(new Web);
+	std::unique_ptr<Record> record(new Record);
+
+	//Conveyor conv;
+	//SlewingWheel wheel;
+	//Flow flow;
+	//Berth berth;
+	//TrainLoader train;
+	//Yard yard;
+	//Silo silo;
+	//SimuCore simucore;
+	//Environment env;
+	//Energy energy;
+	//Message message;
+	//Web web;
+	//Record record;
 
 	/*Shader*/
 	Shader convShader("res/Shaders/Shader_for_2D/shader_conv_2d.vert", "res/Shaders/Shader_for_2D/shader_conv_2d.frag", "res/Shaders/Shader_for_2D/shader_conv_2d.geom");
@@ -115,10 +126,10 @@ void Console::run()
 	//状态初始化
 	if (this->random_initiating)
 	{
-		berth.ship_random_initiator(simucore);
-		train.train_random_initiator(simucore);
-		yard.yard_random_initiator(simucore);
-		silo.silo_random_initiator(simucore);
+		berth->ship_random_initiator(*simucore);
+		train->train_random_initiator(*simucore);
+		yard->yard_random_initiator(*simucore);
+		silo->silo_random_initiator(*simucore);
 	}
 
 	//深度效果显示
@@ -132,125 +143,138 @@ void Console::run()
 	ImGui::StyleColorsDark();
 	//启用中文字体，但会大幅提升CPU占用率
 	ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\msyh.ttc", 18.0f, NULL, io.Fonts->GetGlyphRangesChineseFull());
-	conv.initGuiStyle();
-	flow.initGuiStyle();
-	berth.initGuiStyle();
-	train.initGuiStyle();
-	yard.initGuiStyle();
-	silo.initGuiStyle();
-	simucore.initGuiStyle();
-	energy.initGuiStyle();
-	message.initGuiStyle();
-	web.initGuiStyle();
+	conv->initGuiStyle();
+	flow->initGuiStyle();
+	berth->initGuiStyle();
+	train->initGuiStyle();
+	yard->initGuiStyle();
+	silo->initGuiStyle();
+	simucore->initGuiStyle();
+	energy->initGuiStyle();
+	message->initGuiStyle();
+	web->initGuiStyle();
+	record->initGuiStyle();
 	//背景
-	env.createEnv(woodShader, glassShader, skyboxShader);
+	env->createEnv(woodShader, glassShader, skyboxShader);
 
 	while (!glfwWindowShouldClose(window))
 	{
-		env.processInput(camera, window);
+		env->processInput(camera, window);
 		int end_train_1 = false;
 		int end_train_2 = false;
 		glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//更新状态
-		simucore.updateTime();
-		env.updateEnv();
-		if ((!simucore.simu_pause && simucore.freshRequire) || simucore.stepping)
+		simucore->updateTime();
+		env->updateEnv();
+		if ((!simucore->simu_pause && simucore->freshRequire) || simucore->stepping)
 		{
-			conv.updateConvs((float)simucore.freshGapTime, simucore.run_rate, web.convAmount);
-			berth.updateBuckets((float)simucore.freshGapTime, simucore.run_rate);
-			if (berth.berth_finished != -1)
+			conv->updateConvs((float)simucore->freshGapTime, simucore->run_rate, web->convAmount);
+			berth->updateBuckets((float)simucore->freshGapTime, simucore->run_rate);
+			if (berth->berth_finished != -1)
 			{
 				//船舶卸空结束
-				flow.end_shipunloading(message, energy, berth.berth_finished, conv, wheel, berth, yard);
+				flow->end_shipunloading(*message, *energy, berth->berth_finished, *conv, *wheel, *berth, *yard);
 			}
-			int ret_ship = berth.updateShips((float)simucore.freshGapTime, simucore.run_rate);
+			int ret_ship = berth->updateShips((float)simucore->freshGapTime, simucore->run_rate);
 			if (ret_ship == 1)
 			{
 				//装船装满结束
-				flow.end_shiploading(energy, berth, web);
+				flow->end_shiploading(*energy, *berth, *web);
 			}
-			end_train_1 = train.updateTrains((float)simucore.freshGapTime, simucore.run_rate);
-			if (yard.updateYards((float)simucore.freshGapTime, simucore.run_rate))
+			end_train_1 = train->updateTrains((float)simucore->freshGapTime, simucore->run_rate);
+			if (yard->updateYards((float)simucore->freshGapTime, simucore->run_rate))
 			{
-				flow.stop_yard_flow(energy, yard.terminate_wheel, berth, train, silo, web);
+				flow->stop_yard_flow(*energy, yard->terminate_wheel, *berth, *train, *silo, *web);
 			}
-			silo.updateStraight((float)simucore.freshGapTime, simucore.run_rate);
-			if (silo.updateSilos((float)simucore.freshGapTime, simucore.run_rate))
+			silo->updateStraight((float)simucore->freshGapTime, simucore->run_rate);
+			if (silo->updateSilos((float)simucore->freshGapTime, simucore->run_rate))
 			{
-				flow.stop_silo_flow(energy, yard, web);
+				flow->stop_silo_flow(*energy, *yard, *web);
 			}
-			web.update(simucore, (float)simucore.freshGapTime, simucore.run_rate);	//急停后死循环
-			if (web.finishEndName != "NULL")
+			web->update(*simucore, (float)simucore->freshGapTime, simucore->run_rate);
+			if (web->finishEndName != "NULL")
 			{
-				flow.end_web(conv, wheel, web.finishEndName);
+				flow->end_web(*conv, *wheel, web->finishEndName);
 			}
-			energy.update(message, simucore.run_rate, (float)simucore.freshGapTime);
-			if (energy.trip != -1)
+			energy->update(*message, simucore->run_rate, (float)simucore->freshGapTime);
+			if (energy->trip != -1)
 			{
 				//变压器跳闸
-				flow.trip_end(energy.trip == 0, energy.getEquipments(), conv, wheel, berth, train, yard, silo, web);
+				flow->trip_end(energy->trip == 0, energy->getEquipments(), *conv, *wheel, *berth, *train, *yard, *silo, *web);
 			}
 			//刷新复位
-			if (simucore.freshRequire)
+			if (simucore->freshRequire)
 			{
-				simucore.freshRequire = false;
+				simucore->freshRequire = false;
 			}
 			//步进修正
-			if (simucore.stepping)
+			if (simucore->stepping)
 			{
-				simucore.stepping = false;
+				simucore->stepping = false;
 			}
 		}
 		//重置
-		if (simucore.reset_rand || simucore.reset_zero)
+		if (simucore->reset_rand || simucore->reset_zero)
 		{
-			conv.reset();
-			wheel.reset();
-			flow.reset();
-			berth.reset(simucore, simucore.reset_rand);
-			train.reset(simucore, simucore.reset_rand);
-			yard.reset(simucore, simucore.reset_rand);
-			silo.reset(simucore, simucore.reset_rand);
-			simucore.reset_rand = false;
-			simucore.reset_zero = false;
-			energy.reset();
-			message.reset();
-			web.reset();
+			conv->reset();
+			wheel->reset();
+			flow->reset();
+			berth->reset(*simucore, simucore->reset_rand);
+			train->reset(*simucore, simucore->reset_rand);
+			yard->reset(*simucore, simucore->reset_rand);
+			silo->reset(*simucore, simucore->reset_rand);
+			simucore->reset_rand = false;
+			simucore->reset_zero = false;
+			energy->reset();
+			message->reset();
+			web->reset();
 		}
 		//绘制图像
-		conv.draw(camera, convShader, 0.3f * std::sin((float)simucore.time * 2) + 0.7f);
-		wheel.draw(camera, wheelShader);
-		berth.drawUnloader(camera, unloaderShader, bucketShader);
-		berth.drawLoader(camera, unloaderShader);
-		berth.drawShip(camera, shipShader);
-		train.drawBuilding(camera, buildingShader);
-		train.drawTrain(camera, trainShader);
-		yard.drawYard(camera, yardShader);
-		silo.drawSilo(camera, siloShader);
-		web.drawFrags(camera, fragsShader);
+		conv->draw(camera, convShader, 0.3f * std::sin((float)simucore->time * 2) + 0.7f);
+		wheel->draw(camera, wheelShader);
+		berth->drawUnloader(camera, unloaderShader, bucketShader);
+		berth->drawLoader(camera, unloaderShader);
+		berth->drawShip(camera, shipShader);
+		train->drawBuilding(camera, buildingShader);
+		train->drawTrain(camera, trainShader);
+		yard->drawYard(camera, yardShader);
+		silo->drawSilo(camera, siloShader);
+		web->drawFrags(camera, fragsShader);
 		//start new frame for imGUI
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 		//控制面板窗口
 		ImGui::Begin(u8"控制面板");
-		simucore.base_info();
+		simucore->base_info();
 		this->identity_choose();
+		if (this->compitence == 12)
+		{
+			int ret = record->showGui();
+			if (ret > 0)
+			{
+				record->save_level(ret, *message, this->random_initiating, this->compitence, *simucore, *energy, *env, *web, *flow, *conv, *wheel, *berth, *train, *yard, *silo);
+			}
+			else if (ret < 0)
+			{
+				record->load_level(-ret, *message, this->random_initiating, this->compitence, *simucore, *energy, *env, *web, *flow, *conv, *wheel, *berth, *train, *yard, *silo);
+			}
+		}
 		if (this->compitence == 6 || this->compitence == 12)
 		{
-			simucore.simulator_gui();
+			simucore->simulator_gui();
 		}
-		env.env_dispatch(simucore.runtime_hours, simucore.runtime_minutes, (this->compitence == 11 || this->compitence == 12), camera, woodShader, glassShader, skyboxShader);
+		env->env_dispatch(simucore->runtime_hours, simucore->runtime_minutes, (this->compitence == 11 || this->compitence == 12), camera, woodShader, glassShader, skyboxShader);
 		if (this->compitence == 9 || this->compitence == 10 || this->compitence == 12)
 		{
-			energy.transformerDispatch();
+			energy->transformerDispatch();
 		}
 		if (this->compitence == 5 || this->compitence == 10 || this->compitence == 12)
 		{
-			web.web_dispatch(this->compitence == 12, this->compitence == 10 || this->compitence == 12);
-			conv.conv_dispatch(this->compitence == 12);
-			flow.showGui(message, energy, conv, wheel, berth, train, yard, silo, web);
+			web->web_dispatch(this->compitence == 12, this->compitence == 10 || this->compitence == 12);
+			conv->conv_dispatch(this->compitence == 12);
+			flow->showGui(*message, *energy, *conv, *wheel, *berth, *train, *yard, *silo, *web);
 		}
 		if ((this->compitence > 0 && this->compitence < 5) || this->compitence == 10 || this->compitence == 12)
 		{
@@ -259,20 +283,20 @@ void Console::run()
 				ImGui::Indent();
 				if (this->compitence != 1 && this->compitence != 3)
 				{
-					int ship_berth = berth.ship_dispatch(message);
+					int ship_berth = berth->ship_dispatch(*message);
 					if (ship_berth != -1)
 					{
 						//船舶离港中断
-						flow.ship_leave(energy, ship_berth, yard, web);
+						flow->ship_leave(*energy, ship_berth, *yard, *web);
 					}
 				}
 				if (this->compitence == 1 || this->compitence == 10 || this->compitence == 12)
 				{
-					berth.unloader_dispatch();
+					berth->unloader_dispatch();
 				}
 				if (this->compitence != 1 && this->compitence != 2)
 				{
-					end_train_2 = train.train_dispatch(message);
+					end_train_2 = train->train_dispatch(*message);
 				}
 				ImGui::Text(" ");
 				ImGui::Unindent();
@@ -283,29 +307,29 @@ void Console::run()
 			if (ImGui::CollapsingHeader(u8"堆场与筒仓调度台"))
 			{
 				ImGui::Indent();
-				flow.add_type(message, conv, wheel, berth, train, yard, web);
+				flow->add_type(*message, *conv, *wheel, *berth, *train, *yard, *web);
 				if (this->compitence != 8)
 				{
-					yard.yard_dispatch(message, this->compitence == 12);
+					yard->yard_dispatch(*message, this->compitence == 12);
 				}
 				if (this->compitence != 7)
 				{
-					silo.silo_dispatch(this->compitence == 12);
+					silo->silo_dispatch(this->compitence == 12);
 				}
 				ImGui::Unindent();
 			}
 		}
 		ImGui::End();
-		flow.show_ground();
-		yard.yard_choose(message);
-		silo.show_select();
-		message.show();
+		flow->show_ground();
+		yard->yard_choose(*message);
+		silo->show_select();
+		message->show();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		//末尾处理
 		if (end_train_1 || end_train_2)
 		{
-			flow.train_check(energy, end_train_1, end_train_2, train, yard, web);
+			flow->train_check(*energy, end_train_1, end_train_2, *train, *yard, *web);
 		}
 		glfwSwapBuffers(window);
 		glfwPollEvents();

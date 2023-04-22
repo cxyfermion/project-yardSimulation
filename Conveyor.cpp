@@ -663,17 +663,17 @@ void Conveyor::run_loaded(int index_flow, int type, int index, std::vector<std::
 	}
 }
 
-void Conveyor::shutDown(int index_flow)
-{
-	//流程停止，将对应流程始源输入设为空
-	for (std::vector<FlowState>::iterator it1 = this->act_flows.begin(); it1 != this->act_flows.end(); it1++)
-	{
-		if (it1->flow_num == index_flow)
-		{
-			it1->begin = false;
-		}
-	}
-}
+//void Conveyor::shutDown(int index_flow)
+//{
+//	//流程停止，将对应流程始源输入设为空
+//	for (std::vector<FlowState>::iterator it1 = this->act_flows.begin(); it1 != this->act_flows.end(); it1++)
+//	{
+//		if (it1->flow_num == index_flow)
+//		{
+//			it1->begin = false;
+//		}
+//	}
+//}
 
 void Conveyor::cancel(std::vector<std::string>& equipments)
 {

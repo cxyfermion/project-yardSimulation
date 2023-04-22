@@ -18,6 +18,7 @@
 //仿真核心
 class SimuCore
 {
+	friend class Record;
 public:
 	SimuCore();
 	void initGuiStyle();								//样式初始化

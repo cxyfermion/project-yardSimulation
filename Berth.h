@@ -97,6 +97,7 @@ struct Pos_Berth
 //≤¥Œª
 class Berth
 {
+	friend class Record;
 public:
 	Berth();
 	void reset(SimuCore& core, bool rand_init);												//÷ÿ÷√

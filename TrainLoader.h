@@ -53,6 +53,8 @@ struct One_wagon
 {
 	int wagon_idx;		//车皮编号（从1开始）
 	float amount;		//车皮载货量
+	int wagon_type;		//车皮运货大类（0表示未定义）
+	int wagon_index;	//车皮运货小类（0表示未定义）
 };
 
 struct TrainAttrib
@@ -63,16 +65,17 @@ struct TrainAttrib
 	int train_index;				//火车运货小类（0表示未定义）
 	int train_lane;					//火车车道，0为15道，1为16道，2为17道，3为18道
 	int train_state;				//火车状态，-1（顶点着色器的本地变量）超范围（discard），0等待装货（红色），1正在装货（每节车皮，空载白色，满载黑色），2正在离港（蓝色）
-	int total_num;					//火车车皮数：A楼最多28节，B楼最多24节
 	int current_num;				//当前装车车皮序号：从1加到total_num，初始值为1
 	float first_pos;					//第一节车皮的y位置
 	float max_per_wagon;			//每车皮满载装煤量：62-67吨
-	std::vector<One_wagon> wagons;	//火车载煤值
 	float train_coords[7];			//火车坐标：x,y,z,state当前状态,percent存储量百分比，focus获得焦点（未到港时x,y都为0），type货物种类
+	int total_num;					//火车车皮数：A楼最多28节，B楼最多24节
+	std::vector<One_wagon> wagons;	//火车载煤值
 };
 
 class TrainLoader
 {
+	friend class Record;
 public:
 	TrainLoader();
 	void reset(SimuCore& core, bool rand_init);								//重置

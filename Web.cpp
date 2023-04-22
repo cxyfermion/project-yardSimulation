@@ -1580,6 +1580,26 @@ void Web::lose_focus()
 	}
 }
 
+int Web::find_to(std::string toName)
+{
+	FindNode findnode;
+	findnode.target = toName;
+	std::vector<Node>::iterator it = find_if(this->nodes.begin(), this->nodes.end(), findnode);
+	return it->this_code;
+}
+
+std::string Web::find_toName(int idx)
+{
+	for (std::vector<Node>::const_iterator it = this->nodes.begin(); it != this->nodes.end(); it++)
+	{
+		if (it->this_code == idx)
+		{
+			return it->name;
+		}
+	}
+	return std::string();
+}
+
 void Web::pre_button(bool choosed)
 {
 	this->style->Colors[ImGuiCol_Text] = ImColor(0, 0, 0, 255);

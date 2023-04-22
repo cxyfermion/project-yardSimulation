@@ -82,6 +82,8 @@ TrainLoader::TrainLoader()
 	//火车初始化
 	this->wagon.wagon_idx = 1;
 	this->wagon.amount = 0;
+	this->wagon.wagon_type = 0;
+	this->wagon.wagon_index = 0;
 	this->train.train_idx = 82001;
 	this->train.train_lane = 1;
 	this->train.train_state = 1;
@@ -194,6 +196,8 @@ void TrainLoader::train_random_initiator(SimuCore& core)
 			for (int j = 0; j < this->train.total_num; j++)
 			{
 				this->wagon.wagon_idx = j + 1;
+				this->wagon.wagon_type = this->train.train_type;
+				this->wagon.wagon_index = this->train.train_index;
 				if (this->train.train_state == 0)
 				{
 					this->wagon.amount = 0;
@@ -332,6 +336,25 @@ void TrainLoader::drawTrain(Camera& camera, Shader& trainShader)
 				{
 					//不超过范围的车皮绘制
 					it1->train_coords[4] = (1.0f - it2->amount / it1->max_per_wagon);
+					if (it2->wagon_type == 0)
+					{
+						it1->train_coords[6] = 0.0f;
+					}
+					else if (it2->wagon_type == 1)
+					{
+						if (it2->wagon_index < 7)
+						{
+							it1->train_coords[6] = (float)it2->wagon_index;
+						}
+						else
+						{
+							it1->train_coords[6] = 7.0f;
+						}
+					}
+					else
+					{
+						it1->train_coords[6] = 7.0f;
+					}
 					glBufferData(GL_ARRAY_BUFFER, sizeof(it1->train_coords), &it1->train_coords, GL_STATIC_DRAW);
 					glDrawArrays(GL_POINTS, 0, 1);
 				}
@@ -653,6 +676,8 @@ int TrainLoader::updateTrains(float gapTime, float simurate)
 							if (it2->amount < it1->max_per_wagon)
 							{
 								it2->amount += LOAD_SPEED * gapTime * simurate;
+								it2->wagon_type = it1->train_type;
+								it2->wagon_index = it1->train_index;
 								it1->train_coords[4] = (1.0f - it2->amount / it1->max_per_wagon);
 							}
 							break;
@@ -692,6 +717,8 @@ int TrainLoader::updateTrains(float gapTime, float simurate)
 							if (it2->amount < it1->max_per_wagon)
 							{
 								it2->amount += LOAD_SPEED * gapTime * simurate;
+								it2->wagon_type = it1->train_type;
+								it2->wagon_index = it1->train_index;
 								it1->train_coords[4] = (1.0f - it2->amount / it1->max_per_wagon);
 							}
 							break;

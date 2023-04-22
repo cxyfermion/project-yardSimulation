@@ -21,6 +21,7 @@ struct WheelAttrib
 
 class SlewingWheel
 {
+	friend class Record;
 public:
 	SlewingWheel();
 	void reset();												//ÖØÖÃ

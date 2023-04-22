@@ -1066,7 +1066,6 @@ void Yard::yard_choose(Message& message)
 						it2->child_focus = false;
 					}
 				}
-				this->flow_num_choose = 0;
 			}
 			else
 			{
@@ -1107,7 +1106,6 @@ void Yard::yard_choose(Message& message)
 					it2->child_focus = false;
 				}
 			}
-			//this->flow_num_choose = 0;
 		}
 		this->post_button();
 		ImGui::End();
@@ -1116,6 +1114,7 @@ void Yard::yard_choose(Message& message)
 
 void Yard::set_focus(std::vector<std::string>& equipments)
 {
+	this->flow_num_choose = 0;
 	for (std::vector<Yard_father>::iterator it1 = this->yards.begin(); it1 != this->yards.end(); it1++)
 	{
 		it1->yard_focus = true;
@@ -1161,7 +1160,6 @@ void Yard::set_focus(std::vector<std::string>& equipments)
 
 void Yard::lose_focus()
 {
-	this->flow_num_choose = 0;
 	for (std::vector<Yard_father>::iterator it1 = this->yards.begin(); it1 != this->yards.end(); it1++)
 	{
 		it1->yard_focus = false;
@@ -1180,7 +1178,6 @@ void Yard::send_reset()
 	this->type_choosed = -1;
 	this->index_choosed = -1;
 	this->amount_choosed = 0.0f;
-	this->flow_num_choose = 0;
 }
 
 void Yard::showYardInfo(int yard_area, bool unreal)

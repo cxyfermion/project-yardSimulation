@@ -20,6 +20,14 @@ Environment::Environment()
 	this->lightPos = glm::vec3(1.2f, 1.3f, -1.5f);
 	this->weather = 0;
 	this->circle_radius = 6.0f;
+	this->skybox = false;
+	this->background = true;
+	this->texture_act = 0;
+	this->time_mode = 1;
+	this->minute_local = 0;
+	this->hour_local = 12;
+	this->light = true;
+	this->spotlight = false;
 }
 
 void Environment::updateEnv()
@@ -31,15 +39,15 @@ void Environment::updateEnv()
 
 void Environment::env_dispatch(int hours, int minutes, bool authority, Camera& camera, Shader& woodShader, Shader& glassShader, Shader& skyboxShader)
 {
-	static bool skybox = false;			//天空盒开关
-	static bool background = true;		//背景开关
-	static int texture_act = 0;			//激活的材质
-	static int time_mode = 1;			//时间映射模式：0为没有映射，1为使用仿真时间映射，2为本地指定映射
-	static int minute_local = 0;		//本地分钟
-	static int hour_local = 12;			//本地小时
+	//static bool skybox = false;			//天空盒开关
+	//static bool background = true;		//背景开关
+	//static int texture_act = 0;			//激活的材质
+	//static int time_mode = 1;			//时间映射模式：0为没有映射，1为使用仿真时间映射，2为本地指定映射
+	//static int minute_local = 0;		//本地分钟
+	//static int hour_local = 12;			//本地小时
 	//光源参数
-	static bool light = true;			//光照开关
-	static bool spotlight = false;		//聚光模式
+	//static bool light = true;			//光照开关
+	//static bool spotlight = false;		//聚光模式
 	//材质
 	static float material_specular[3] = { 0.5f, 0.5f, 0.5f };
 	static float material_shininess = { 64.0f };
@@ -65,9 +73,9 @@ void Environment::env_dispatch(int hours, int minutes, bool authority, Camera& c
 		if (ImGui::CollapsingHeader(u8"场景参数"))
 		{
 			ImGui::Indent();
-			ImGui::Checkbox(u8"背景墙开关", &background);
+			ImGui::Checkbox(u8"背景墙开关", &this->background);
 			ImGui::SameLine();
-			ImGui::Checkbox(u8"天空盒开关", &skybox);
+			ImGui::Checkbox(u8"天空盒开关", &this->skybox);
 			ImGui::Text(u8"选择天气：");
 			ImGui::SameLine();
 			ImGui::RadioButton(u8"晴天", &this->weather, 0);
@@ -92,32 +100,32 @@ void Environment::env_dispatch(int hours, int minutes, bool authority, Camera& c
 				ImGui::Text(u8"设置背景墙材质：");
 				ImGui::SameLine();
 				ImGui::SetNextItemWidth(100.0f);
-				ImGui::Combo("  ", &texture_act, this->textures, IM_ARRAYSIZE(this->textures));
+				ImGui::Combo("  ", &this->texture_act, this->textures, IM_ARRAYSIZE(this->textures));
 				//ImGui::ListBox("  ", &texture_act, textures, IM_ARRAYSIZE(textures), 4);
 				//ImGui::PushItemWidth(100.0f);
-				if (texture_act < 6)
+				if (this->texture_act < 6)
 				{
 					ImGui::SameLine();
-					ImGui::Checkbox(u8"光照开关", &light);
-					if (light)
+					ImGui::Checkbox(u8"光照开关", &this->light);
+					if (this->light)
 					{
 						ImGui::Text(u8"选择时间映射模式：");
 						ImGui::SameLine();
-						ImGui::RadioButton(u8"无时间映射", &time_mode, 0);
+						ImGui::RadioButton(u8"无时间映射", &this->time_mode, 0);
 						ImGui::SameLine();
-						ImGui::RadioButton(u8"使用仿真时间映射", &time_mode, 1);
+						ImGui::RadioButton(u8"使用仿真时间映射", &this->time_mode, 1);
 						ImGui::SameLine();
-						ImGui::RadioButton(u8"使用本地时间映射", &time_mode, 2);
-						if (time_mode == 2)
+						ImGui::RadioButton(u8"使用本地时间映射", &this->time_mode, 2);
+						if (this->time_mode == 2)
 						{
 							ImGui::Text(u8"指定本地时间：");
 							ImGui::SameLine();
 							ImGui::SetNextItemWidth(200.0f);
-							ImGui::SliderInt(u8"时", &hour_local, 0, 23);
+							ImGui::SliderInt(u8"时", &this->hour_local, 0, 23);
 							ImGui::SameLine();
 							ImGui::SetNextItemWidth(200.0f);
-							ImGui::SliderInt(u8"分", &minute_local, 0, 59);
-							ImGui::Text((u8"本地时间：" + std::to_string(hour_local) + u8"时" + std::to_string(minute_local) + u8"分").c_str());
+							ImGui::SliderInt(u8"分", &this->minute_local, 0, 59);
+							ImGui::Text((u8"本地时间：" + std::to_string(this->hour_local) + u8"时" + std::to_string(this->minute_local) + u8"分").c_str());
 						}
 						if (ImGui::CollapsingHeader(u8"光照设置"))
 						{
@@ -130,7 +138,7 @@ void Environment::env_dispatch(int hours, int minutes, bool authority, Camera& c
 							ImGui::Text(u8"聚光设置");
 							if (spotlight)
 							{
-								ImGui::Checkbox(u8"聚光模式", &spotlight);
+								ImGui::Checkbox(u8"聚光模式", &this->spotlight);
 								ImGui::ColorEdit3(u8"聚光 环境光", spotLight_ambient);
 								ImGui::ColorEdit3(u8"聚光 散射", spotLight_diffuse);
 								ImGui::ColorEdit3(u8"聚光 反射", spotLight_specular);
@@ -140,7 +148,7 @@ void Environment::env_dispatch(int hours, int minutes, bool authority, Camera& c
 							}
 							else
 							{
-								ImGui::Checkbox(u8"散光模式", &spotlight);
+								ImGui::Checkbox(u8"散光模式", &this->spotlight);
 							}
 							ImGui::Separator();
 							ImGui::Text(u8"定向光设置");
@@ -172,23 +180,23 @@ void Environment::env_dispatch(int hours, int minutes, bool authority, Camera& c
 			ImGui::Unindent();
 		}
 	}
-	if (time_mode == 0)
+	if (this->time_mode == 0)
 	{
-		this->drawEnv(-1, -1, camera, woodShader, glassShader, skyboxShader, background, skybox, texture_act, light, spotlight,
+		this->drawEnv(-1, -1, camera, woodShader, glassShader, skyboxShader, this->background, this->skybox, this->texture_act, this->light, this->spotlight,
 			material_specular, material_shininess, spotLight_ambient, spotLight_diffuse, spotLight_specular,
 			spotLight_cutOff, spotLight_outerCutOff, spotLight_direction, dirLight_direction, dirLight_ambient,
 			dirLight_diffuse, dirLight_specular, pointLights_ambient, pointLights_diffuse, pointLights_specular, pointLights_position);
 	}
-	else if (time_mode == 1)
+	else if (this->time_mode == 1)
 	{
-		this->drawEnv(hours, minutes, camera, woodShader, glassShader, skyboxShader, background, skybox, texture_act, light, spotlight,
+		this->drawEnv(hours, minutes, camera, woodShader, glassShader, skyboxShader, this->background, this->skybox, this->texture_act, this->light, this->spotlight,
 			material_specular, material_shininess, spotLight_ambient, spotLight_diffuse, spotLight_specular,
 			spotLight_cutOff, spotLight_outerCutOff, spotLight_direction, dirLight_direction, dirLight_ambient,
 			dirLight_diffuse, dirLight_specular, pointLights_ambient, pointLights_diffuse, pointLights_specular, pointLights_position);
 	}
-	else if (time_mode == 2)
+	else if (this->time_mode == 2)
 	{
-		this->drawEnv(hour_local, minute_local, camera, woodShader, glassShader, skyboxShader, background, skybox, texture_act, light, spotlight,
+		this->drawEnv(this->hour_local, this->minute_local, camera, woodShader, glassShader, skyboxShader, this->background, this->skybox, this->texture_act, this->light, this->spotlight,
 			material_specular, material_shininess, spotLight_ambient, spotLight_diffuse, spotLight_specular,
 			spotLight_cutOff, spotLight_outerCutOff, spotLight_direction, dirLight_direction, dirLight_ambient,
 			dirLight_diffuse, dirLight_specular, pointLights_ambient, pointLights_diffuse, pointLights_specular, pointLights_position);

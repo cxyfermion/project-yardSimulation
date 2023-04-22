@@ -117,6 +117,7 @@ public:
 //堆场
 class Yard
 {
+	friend class Record;
 public:
 	Yard();
 	void reset(SimuCore& core, bool rand_init);		//重置，rand_init为true表示启动随机初始化
@@ -129,6 +130,7 @@ public:
 	float amount_choosed;							//选中子堆场的货物存量
 	bool data_send;									//数据是否发送
 	bool yard_choosing;								//是否开启堆场选择窗口
+	int flow_num_choose;					//由流程选中的堆场的数量，此变量仅在堆场选择正确且成功启动流程后由流程外界控制其重新置位
 	void drawYard(Camera& camera, Shader& yardShader);
 	void initGuiStyle();								//样式初始化
 	void yard_dispatch(Message& message, bool unreal);				//ImGui堆场状态控制台：可以添加新的货物品种，获取堆场当前状态信息，参数为true表示有强制指定权
@@ -146,7 +148,6 @@ public:
 private:
 	int flow_yard_choosed_1;				//由流程选中的堆场1号
 	int flow_yard_choosed_2;				//由流程选中的堆场2号
-	int flow_num_choose;					//由流程选中的堆场的数量
 	ImGuiStyle* style;						//ImGui样式
 	Type_yard type_unit;					//货物单元，包含货物种类序号及其名称
 	std::vector<Type_yard> names;			//货物种类编号与名称存储容器

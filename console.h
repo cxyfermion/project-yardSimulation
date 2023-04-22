@@ -10,9 +10,11 @@
 #include <imgui_impl_opengl3.h>
 #include "Flow.h"
 #include "Environment.h"
+#include "Record.h"
 
 class Console
 {
+	friend class Record;
 public:
 	Console();
 	int init();

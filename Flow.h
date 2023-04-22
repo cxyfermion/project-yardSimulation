@@ -97,6 +97,7 @@ public:
 
 class Flow
 {
+	friend class Record;
 public:
 	Flow();
 	void reset();						//ÖØÖÃ
