@@ -114,7 +114,7 @@ public:
 	void updateBuckets(float gapTime, float simurate);										//更新抓斗状态
 	int updateShips(float gapTime, float simurate);											//更新船只状态，返回1为装船装满结束
 	void add_type(std::string str_name, int type_type);									//添加货物新类
-	bool set_unloading_ship(Message& message, std::vector<std::string>& equipments);		//卸船机卸船准备检查，返回false为开始失败
+	bool set_unloading_ship(bool berth3, Message& message, std::vector<std::string>& equipments);		//卸船机卸船准备检查，返回false为开始失败
 	bool set_loading_ship(Message& message, int load_type, int load_index);				//装船机装船准备检查，返回false为装船启动失败
 	void run_unloader_unloaded(Message& message, std::vector<std::string>& equipments);	//空载运行
 	void run_unloader_loaded(std::vector<std::string>& equipments);						//负载运行

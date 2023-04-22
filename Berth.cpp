@@ -1938,7 +1938,7 @@ void Berth::add_type(std::string str_name, int type_type)
 	this->names.push_back(this->type_unit);
 }
 
-bool Berth::set_unloading_ship(Message& message, std::vector<std::string>& equipments)
+bool Berth::set_unloading_ship(bool berth3, Message& message, std::vector<std::string>& equipments)
 {
 	bool ret = false;
 	std::vector<std::string>::const_iterator it1 = equipments.begin();
@@ -1957,8 +1957,11 @@ bool Berth::set_unloading_ship(Message& message, std::vector<std::string>& equip
 	}
 	if (!ret)
 	{
-		//std::cout << "启动流程失败::泊位没有船舶" << std::endl;
-		message.push_message(u8"启动流程失败::泊位没有船舶");
+		if (!berth3)
+		{
+			//std::cout << "启动流程失败::泊位没有船舶" << std::endl;
+			message.push_message(u8"启动流程失败::泊位没有船舶");
+		}
 	}
 	return ret;
 }
@@ -2173,7 +2176,7 @@ void Berth::run_unloader_loaded(std::vector<std::string>& equipments)
 					{
 						it2->unloader_state = 2;
 						this->unloader_coords[5 * it2->unloader_index + 3] = 2.0f;
-						this->webUnloaders[it2->unloader_index] = 1;
+						this->webUnloaders[it2->unloader_index - 4] = 1;
 					}
 				}
 			}

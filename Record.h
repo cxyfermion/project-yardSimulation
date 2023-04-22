@@ -2,7 +2,6 @@
 #include <fstream>
 #include <glm/glm.hpp>
 #include <imgui.h>
-#include "Environment.h"
 #include "Flow.h"
 
 //中控
@@ -45,7 +44,7 @@ struct EnergyFile
 	float cur_energy[8];							//8台主变的当前总能耗
 	int state[153];									//开关柜状态
 	float time[153];								//开关柜运行总时长
-	float pow_rate[153];							//开关柜运行总时长
+	float pow_rate[153];							//当前功率比例
 };
 
 //环境类存储
@@ -235,6 +234,16 @@ struct Save
 	SiloFile siloFile;
 };
 
+//能源参数结构体
+struct Statistics
+{
+	double total_time;			//程序总运行时间（无论是否暂停）
+	double simuTime;			//仿真运行时间
+	float total_energy;			//总能耗
+	float cur_energy[8];		//8台主变的当前总能耗
+	float time[153];			//开关柜运行总时长
+};
+
 class Record
 {
 public:
@@ -242,10 +251,14 @@ public:
 	void initGuiStyle();
 	void save_level(int mark, Message& message, bool& random_initiating, int& compitence, SimuCore& core, Energy& energy, Environment& environment, Web& web, Flow& flow, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo);		//储存存档
 	void load_level(int mark, Message& message, bool& random_initiating, int& compitence, SimuCore& core, Energy& energy, Environment& environment, Web& web, Flow& flow, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo);		//存档读取
-	int showGui();			//显示界面，若返回0表示无事发生；返回正数表示存档的栏位，返回负数表示读档的栏位
-	//bool new_saved;			//在当前仿真循环已经存储过一次的情况下，记录为true，表示再次存档会覆盖原来储存的一个存档；记录为false，表示当前仿真循环还未存过档，会记录新的存档
+	void save_energy(int mark, Message& message, SimuCore& core, Energy& energy);		//仅保存程序运行进度与能源数据
+	bool load_energy(int mark);
+	int showGui();																			//显示界面，若返回0表示无事发生；返回正数表示存档的栏位，返回负数表示读档的栏位
+	void energyGui(Message& message, SimuCore& core, Energy& energy);					//能源数据控制界面，返回0表示无事发生；返回正数表示存档的栏位
 
 private:
+	Statistics statistics;
+	std::vector<Statistics> muchStatistics;
 	Save save_file;
 	FragmentFile fragmentFile;
 	FlowState flowState;

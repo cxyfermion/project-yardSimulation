@@ -2,6 +2,7 @@
 
 #define FLUX 0.22f * 3.15f * 0.8f		//流程通用流量
 #define RECLAIM_SAFE_START 10.0f		//取料流程启动时堆场最低当前容量
+#define RECORD_FLOW "FlowShutdownRecord.txt"
 
 Flow::Flow()
 {
@@ -204,7 +205,7 @@ void Flow::show_ground()
 {
 	if (this->windowGroundChoose)
 	{
-		ImGui::Begin(u8"地坑货物种类选择");
+		ImGui::Begin(u8"地坑或3泊位的货物种类选择");
 		ImGui::Text(u8"选择货物大类：");
 		ImGui::SameLine();
 		ImGui::RadioButton(u8"大类散货", &this->chooseType, 1);
@@ -442,6 +443,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 						int type = 0;
 						int index = 0;
 						float amount = 0.0f;
+						bool berth3 = (it->flow_idx > 78 && it->flow_idx < 87) || it->flow_idx == 91 || it->flow_idx == 92;
 						if (it->flow_idx < 62)
 						{
 							//通用泊位
@@ -455,6 +457,20 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 							type = berth.get_down_type();
 							index = berth.get_down_index();
 							amount = berth.get_down_amount();
+						}
+						else if (berth3)
+						{
+							//3泊位
+							if (!this->groundSelected && !this->windowGroundChoose)
+							{
+								this->windowGroundChoose = true;
+							}
+							else if (this->groundSelected && !this->windowGroundChoose)
+							{
+								type = this->chooseType;
+								index = this->chooseIndex;
+								amount = 10000.0f;
+							}
 						}
 						if (type <= 0 || index <= 0 || amount == 0.0f)
 						{
@@ -489,7 +505,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 								if (yard.start_stack(message, it->equipments, yard.yard_choosed, yard.child_choosed, type, index, amount, FLUX))
 								{
 									//当前泊位无船不允许启动流程，视为不允许空载运行
-									if (berth.set_unloading_ship(message, it->equipments))
+									if (berth.set_unloading_ship(berth3, message, it->equipments) || berth3)
 									{
 										yard.flow_num_choose = 0;
 										//斗轮机运行
@@ -805,6 +821,9 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 			{
 				ImGui::Begin(u8"确认急停");
 				ImGui::Text(u8"确认流程急停？");
+				static char briefing[500] = "";
+				ImGui::InputTextWithHint(" ", u8"在此输入急停原因", briefing, IM_ARRAYSIZE(briefing));
+				std::string reason = briefing;
 				this->style->Colors[ImGuiCol_Button] = ImColor(250, 0, 0, 255);
 				this->style->Colors[ImGuiCol_Text] = ImColor(0, 0, 0, 255);
 				if (ImGui::Button(u8"确认"))
@@ -827,6 +846,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 					energy.emergencyEnd(it->equipments);
 					//物流网急停
 					web.emergencyShutDown(it->equipments);
+					this->save_reason(reason);
 					it->flow_state = 0;
 					it->scene_ready = false;
 					this->emergency_stop = false;
@@ -1019,9 +1039,70 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 			this->style->Colors[ImGuiCol_Text] = ImColor(255, 255, 255, 255);
 			this->style->Colors[ImGuiCol_Button] = ImColor(200, 200, 200, 255);
 			ImGui::Unindent();
+			ImGui::Separator();
+		}
+		static bool showReason = false;
+		this->style->Colors[ImGuiCol_Button] = ImColor(200, 200, 200, 255);
+		this->style->Colors[ImGuiCol_Text] = ImColor(0, 0, 0, 255);
+		if (ImGui::Button(u8"切换历史急停原因显示"))
+		{
+			if (!showReason)
+			{
+				showReason = true;
+				this->load_reason(message);
+			}
+			else
+			{
+				showReason = false;
+			}
+		}
+		this->style->Colors[ImGuiCol_Text] = ImColor(255, 255, 255, 255);
+		if (showReason)
+		{
+			for (std::vector<std::string>::const_iterator it1 = this->reasons.begin(); it1 != this->reasons.end(); it1++)
+			{
+				ImGui::Text(it1->c_str());
+			}
 		}
 		ImGui::Text("  ");
 		ImGui::Unindent();
+	}
+}
+
+void Flow::weatherCheck(Message& message, Environment& environment, Energy& energy, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web)
+{
+	if (environment.weather == 3 || environment.weather == 4 || environment.weather == 5 || environment.weather == 8)
+	{
+		bool temp = false;
+		for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
+		{
+			if (it1->flow_state > 0)
+			{
+				temp = true;
+				//皮带变红色
+				conv.emergency_shutDown(stoi(it1->flow_name), it1->equipments);
+				//斗轮机变红色
+				wheel.shutDown(it1->equipments);
+				//泊位设备变红色
+				berth.unloader_shutDown(it1->equipments);
+				//装车楼变红色
+				train.shutDown(it1->equipments);
+				//堆场停止
+				yard.yard_end(it1->equipments);
+				//筒仓停止
+				silo.end_silo(it1->equipments);
+				//开关柜急停
+				energy.emergencyEnd(it1->equipments);
+				//物流网急停
+				web.emergencyShutDown(it1->equipments);
+				it1->flow_state = 0;
+				it1->scene_ready = false;
+			}
+		}
+		if (temp)
+		{
+			message.push_message(u8"警告::极端天气导致全部流程急停");
+		}
 	}
 }
 
@@ -1454,4 +1535,29 @@ void Flow::pressButton(FlowAttrib& flow, Conveyor& conv, SlewingWheel& wheel, Be
 		berth.lose_focus();
 		web.lose_focus();
 	}
+}
+
+void Flow::save_reason(std::string reason)
+{
+	std::ofstream file(RECORD_FLOW, std::ios::app);
+	file << reason << std::endl;
+	file.close();
+}
+
+void Flow::load_reason(Message& message)
+{
+	this->reasons.clear();
+	std::ifstream file;
+	file.open(RECORD_FLOW, std::ios::in);
+	if (!file.is_open())
+	{
+		message.push_message(u8"紧急停机原因文件打开失败");
+		return;
+	}
+	std::string buf;
+	while (file >> buf)
+	{
+		this->reasons.push_back(buf);
+	}
+	file.close();
 }

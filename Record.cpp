@@ -1,5 +1,7 @@
 #include "Record.h"
 
+#define NUM_SLOTS 10        //存档槽的数量
+
 /*
     //this->save_file.save_coins = this->total_coin;
     //for (int i = 0; i < 4; i++)
@@ -43,11 +45,9 @@
     //}
 */
 
-//constexpr auto RECORDER_FILE = "recorder.txt";
-
 Record::Record()
 {
-    //this->new_saved = false;
+
 }
 
 void Record::initGuiStyle()
@@ -1106,33 +1106,132 @@ void Record::load_level(int mark, Message& message, bool& random_initiating, int
     message.push_message(u8"游戏读取成功！");
 }
 
+void Record::save_energy(int mark, Message& message, SimuCore& core, Energy& energy)
+{
+    this->statistics.total_time = core.time;
+    this->statistics.simuTime = core.simuTime;
+    this->statistics.total_energy = energy.total_energy;
+    int i1 = 0;
+    int i2 = 0;
+    for (std::vector<Transformer>::const_iterator it1 = energy.transformers.begin(); it1 != energy.transformers.end(); it1++)
+    {
+        this->statistics.cur_energy[i1] = it1->cur_energy;
+        for (std::vector<switchGear>::const_iterator it2 = it1->gears.begin(); it2 != it1->gears.end(); it2++)
+        {
+            this->statistics.time[i2] = it2->time;
+            i2++;
+        }
+        i1++;
+    }
+    std::string route = "EnergyRecorder_" + std::to_string(mark) + ".txt";
+    std::ofstream file(route.c_str());
+    file.write((char*)&this->statistics.total_time, sizeof(this->statistics.total_time));
+    file.write((char*)&this->statistics.simuTime, sizeof(this->statistics.simuTime));
+    file.write((char*)&this->statistics.total_energy, sizeof(this->statistics.total_energy));
+    file.write((char*)&this->statistics.cur_energy, sizeof(this->statistics.cur_energy));
+    file.write((char*)&this->statistics.time, sizeof(this->statistics.time));
+    file.close();
+    message.push_message(u8"能源数据保存成功！");
+}
+
+bool Record::load_energy(int mark)
+{
+    std::ifstream file;
+    std::string route = "EnergyRecorder_" + std::to_string(mark) + ".txt";
+    file.open(route.c_str(), std::ios::in);
+    if (!file.is_open())
+    {
+        return false;
+    }
+    else
+    {
+        file.read((char*)&this->statistics.total_time, sizeof(this->statistics.total_time));
+        file.read((char*)&this->statistics.simuTime, sizeof(this->statistics.simuTime));
+        file.read((char*)&this->statistics.total_energy, sizeof(this->statistics.total_energy));
+        file.read((char*)&this->statistics.cur_energy, sizeof(this->statistics.cur_energy));
+        file.read((char*)&this->statistics.time, sizeof(this->statistics.time));
+    }
+    file.close();
+    this->muchStatistics.push_back(this->statistics);
+    return true;
+}
+
 int Record::showGui()
 {
     int ret = 0;
     static int saveMark = 1;
-    if (ImGui::CollapsingHeader(u8"存储管理"))
+    ImGui::Text(u8"存档栏位选择：");
+    for (int i = 1; i <= NUM_SLOTS; i++)
     {
-        ImGui::Indent();
-        ImGui::Text(u8"存档栏位选择：");
-        for (int i = 1; i <= 10; i++)
-        {
-            ImGui::SameLine();
-            ImGui::RadioButton((u8"栏位" + std::to_string(i)).c_str(), &saveMark, i);
-        }
-        this->pre_button();
-        if (ImGui::Button(u8"文件存储"))
-        {
-            ret = saveMark;
-        }
         ImGui::SameLine();
-        if (ImGui::Button(u8"文件读取"))
-        {
-            ret = -saveMark;
-        }
-        this->post_button();
-        ImGui::Unindent();
+        ImGui::RadioButton((u8"存档" + std::to_string(i)).c_str(), &saveMark, i);
     }
+    this->pre_button();
+    if (ImGui::Button(u8"文件存储"))
+    {
+        ret = saveMark;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(u8"文件读取"))
+    {
+        ret = -saveMark;
+    }
+    this->post_button();
     return ret;
+}
+
+void Record::energyGui(Message& message, SimuCore& core, Energy& energy)
+{
+    static int saveSlot = 1;
+    static bool readEnergy = false;
+    ImGui::Text(u8"能源数据栏位选择：");
+    for (int i = 1; i <= NUM_SLOTS; i++)
+    {
+        ImGui::SameLine();
+        ImGui::RadioButton((u8"数据" + std::to_string(i)).c_str(), &saveSlot, i);
+    }
+    this->pre_button();
+    if (ImGui::Button(u8"数据存储"))
+    {
+        this->save_energy(saveSlot, message, core, energy);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(u8"显示历史能源数据"))
+    {
+        if (!readEnergy)
+        {
+            readEnergy = true;
+            for (int i = 1; i <= NUM_SLOTS; i++)
+            {
+                this->load_energy(i);
+            }
+        }
+    }
+    this->post_button();
+    if (readEnergy)
+    {
+        int temp = 1;
+        for (std::vector<Statistics>::iterator it = this->muchStatistics.begin(); it != this->muchStatistics.end(); it++)
+        {
+            ImGui::Separator();
+            ImGui::Text((u8"档位" + std::to_string(temp)).c_str());
+            ImGui::SameLine();
+            ImGui::Text((u8"    程序运行时间：" + std::to_string(it->total_time)).c_str());
+            ImGui::Text((u8"仿真运行时间：" + std::to_string(it->simuTime)).c_str());
+            ImGui::SameLine();
+            ImGui::Text((u8"    总能耗：" + std::to_string(it->total_energy)).c_str());
+            ImGui::Text(u8"主变能耗：");
+            for (int i = 0; i < 8; i++)
+            {
+                ImGui::Text((u8"  " + std::to_string(i + 1) + u8"号变能耗：" + std::to_string(it->cur_energy[i])).c_str());
+                if (i != 7 && i != 3)
+                {
+                    ImGui::SameLine();
+                }
+            }
+            temp++;
+        }
+    }
 }
 
 void Record::pre_button()

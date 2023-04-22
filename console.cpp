@@ -167,6 +167,7 @@ void Console::run()
 		//更新状态
 		simucore->updateTime();
 		env->updateEnv();
+		flow->weatherCheck(*message, *env, *energy, *conv, *wheel, *berth, *train, *yard, *silo, *web);
 		if ((!simucore->simu_pause && simucore->freshRequire) || simucore->stepping)
 		{
 			conv->updateConvs((float)simucore->freshGapTime, simucore->run_rate, web->convAmount);
@@ -251,14 +252,20 @@ void Console::run()
 		this->identity_choose();
 		if (this->compitence == 12)
 		{
-			int ret = record->showGui();
-			if (ret > 0)
+			if (ImGui::CollapsingHeader(u8"存储管理"))
 			{
-				record->save_level(ret, *message, this->random_initiating, this->compitence, *simucore, *energy, *env, *web, *flow, *conv, *wheel, *berth, *train, *yard, *silo);
-			}
-			else if (ret < 0)
-			{
-				record->load_level(-ret, *message, this->random_initiating, this->compitence, *simucore, *energy, *env, *web, *flow, *conv, *wheel, *berth, *train, *yard, *silo);
+				ImGui::Indent();
+				int ret = record->showGui();
+				if (ret > 0)
+				{
+					record->save_level(ret, *message, this->random_initiating, this->compitence, *simucore, *energy, *env, *web, *flow, *conv, *wheel, *berth, *train, *yard, *silo);
+				}
+				else if (ret < 0)
+				{
+					record->load_level(-ret, *message, this->random_initiating, this->compitence, *simucore, *energy, *env, *web, *flow, *conv, *wheel, *berth, *train, *yard, *silo);
+				}
+				record->energyGui(*message, *simucore, *energy);
+				ImGui::Unindent();
 			}
 		}
 		if (this->compitence == 6 || this->compitence == 12)

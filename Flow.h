@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <fstream>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -14,6 +15,7 @@
 #include "Silo.h"
 #include "SimuCore.h"
 #include "Energy.h"
+#include "Environment.h"
 
 struct Type_flow
 {
@@ -104,16 +106,17 @@ public:
 	bool window_confirm;				//流程负载启动确认窗口
 	void initGuiStyle();					//样式初始化
 	void show_ground();					//显示地坑种类选择界面
-	void add_type(Message& message, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Web& web);											//添加货物种类
-	void showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web);					//展示流程按钮
-	void train_check(Energy& energy, int end_train_1, int end_train_2, TrainLoader& train, Yard& yard, Web& web);															//火车卸货中止检查
-	void stop_yard_flow(Energy& energy, std::string name_wheel, Berth& berth, TrainLoader& train, Silo& silo, Web& web);														//堆场取料用尽触发的流程停止
-	void stop_silo_flow(Energy& energy, Yard& yard, Web& web);																													//筒仓堆满或达标停机
-	void ship_leave(Energy& energy, int berth_idx, Yard& yard, Web& web);																										//船舶突然离泊触发的流程空载运行
-	void end_shiploading(Energy& energy, Berth& berth, Web& web);																												//装船结束
-	void end_shipunloading(Message& message, Energy& energy, int berth_finished, Conveyor& conv, SlewingWheel& wheel, Berth& berth, Yard& yard);							//卸船结束
-	void trip_end(bool all, std::vector<std::string> equipments, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web);		//变压器跳闸，第一个参数为true表示主变跳闸
-	void end_web(Conveyor& conv, SlewingWheel& wheel, std::string finishEndName);																								//物流网结束使皮带变蓝色闪烁，斗轮机变红色
+	void add_type(Message& message, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Web& web);																//添加货物种类
+	void showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web);										//展示流程按钮
+	void weatherCheck(Message& message, Environment& environment, Energy& energy, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web);	//天气检查
+	void train_check(Energy& energy, int end_train_1, int end_train_2, TrainLoader& train, Yard& yard, Web& web);																				//火车卸货中止检查
+	void stop_yard_flow(Energy& energy, std::string name_wheel, Berth& berth, TrainLoader& train, Silo& silo, Web& web);																			//堆场取料用尽触发的流程停止
+	void stop_silo_flow(Energy& energy, Yard& yard, Web& web);																																		//筒仓堆满或达标停机
+	void ship_leave(Energy& energy, int berth_idx, Yard& yard, Web& web);																															//船舶突然离泊触发的流程空载运行
+	void end_shiploading(Energy& energy, Berth& berth, Web& web);																																	//装船结束
+	void end_shipunloading(Message& message, Energy& energy, int berth_finished, Conveyor& conv, SlewingWheel& wheel, Berth& berth, Yard& yard);												//卸船结束
+	void trip_end(bool all, std::vector<std::string> equipments, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web);							//变压器跳闸，第一个参数为true表示主变跳闸
+	void end_web(Conveyor& conv, SlewingWheel& wheel, std::string finishEndName);																													//物流网结束使皮带变蓝色闪烁，斗轮机变红色
 
 private:
 	ImGuiStyle* style;					//ImGui样式存储
@@ -121,6 +124,7 @@ private:
 	std::vector<Type_flow> names;		//货物种类编号与名称存储容器
 	FlowAttrib flow_attr;				//流程
 	std::vector<FlowAttrib> flows;		//流程状态存储容器
+	std::vector<std::string> reasons;	//急停原因历史存储容器
 	bool windowGroundChoose;			//地坑装车种类选择窗口
 	bool groundSelected;				//地坑装车已选定
 	int chooseType;						//地坑选定大类
@@ -130,5 +134,7 @@ private:
 	void setText(bool temp);			//设置按钮字体颜色
 	void showButton(FlowAttrib& flow, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web);	//绘制按钮
 	void pressButton(FlowAttrib& flow, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web);	//单机流程按钮
+	void save_reason(std::string reason);
+	void load_reason(Message& message);
 
 };
