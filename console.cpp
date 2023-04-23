@@ -177,21 +177,21 @@ void Console::run()
 				//´¬²°Ğ¶¿Õ½áÊø
 				flow->end_shipunloading(*message, *energy, berth->berth_finished, *conv, *wheel, *berth, *yard);
 			}
-			int ret_ship = berth->updateShips((float)simucore->freshGapTime, simucore->run_rate);
+			int ret_ship = berth->updateShips(*message, (float)simucore->freshGapTime, simucore->run_rate);
 			if (ret_ship == 1)
 			{
 				//×°´¬×°Âú½áÊø
-				flow->end_shiploading(*energy, *berth, *web);
+				flow->end_shiploading(*message, *energy, *berth, *web);
 			}
 			end_train_1 = train->updateTrains((float)simucore->freshGapTime, simucore->run_rate);
 			if (yard->updateYards((float)simucore->freshGapTime, simucore->run_rate))
 			{
-				flow->stop_yard_flow(*energy, yard->terminate_wheel, *berth, *train, *silo, *web);
+				flow->stop_yard_flow(*message, *energy, yard->terminate_wheel, *berth, *train, *silo, *web);
 			}
 			silo->updateStraight((float)simucore->freshGapTime, simucore->run_rate);
 			if (silo->updateSilos((float)simucore->freshGapTime, simucore->run_rate))
 			{
-				flow->stop_silo_flow(*energy, *yard, *web);
+				flow->stop_silo_flow(*message, *energy, *yard, *web);
 			}
 			web->update(*simucore, (float)simucore->freshGapTime, simucore->run_rate);
 			if (web->finishEndName != "NULL")
@@ -202,7 +202,7 @@ void Console::run()
 			if (energy->trip != -1)
 			{
 				//±äÑ¹Æ÷ÌøÕ¢
-				flow->trip_end(energy->trip == 0, energy->getEquipments(), *conv, *wheel, *berth, *train, *yard, *silo, *web);
+				flow->trip_end(*message, energy->trip == 0, energy->getEquipments(), *conv, *wheel, *berth, *train, *yard, *silo, *web);
 			}
 			//Ë¢ĞÂ¸´Î»
 			if (simucore->freshRequire)
@@ -270,7 +270,7 @@ void Console::run()
 		}
 		if (this->compitence == 6 || this->compitence == 12)
 		{
-			simucore->simulator_gui();
+			simucore->simulator_gui(*message);
 		}
 		env->env_dispatch(simucore->runtime_hours, simucore->runtime_minutes, (this->compitence == 11 || this->compitence == 12), camera, woodShader, glassShader, skyboxShader);
 		if (this->compitence == 9 || this->compitence == 10 || this->compitence == 12)
@@ -336,7 +336,7 @@ void Console::run()
 		//Ä©Î²´¦Àí
 		if (end_train_1 || end_train_2)
 		{
-			flow->train_check(*energy, end_train_1, end_train_2, *train, *yard, *web);
+			flow->train_check(*message, *energy, end_train_1, end_train_2, *train, *yard, *web);
 		}
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -112,7 +112,7 @@ public:
 	int ship_dispatch(Message& message);													//船舶调度控制台，返回需要流程停止的泊位序号
 	void unloader_dispatch();																//卸船机调度台
 	void updateBuckets(float gapTime, float simurate);										//更新抓斗状态
-	int updateShips(float gapTime, float simurate);											//更新船只状态，返回1为装船装满结束
+	int updateShips(Message& message, float gapTime, float simurate);						//更新船只状态，返回1为装船装满结束
 	void add_type(std::string str_name, int type_type);									//添加货物新类
 	bool set_unloading_ship(bool berth3, Message& message, std::vector<std::string>& equipments);		//卸船机卸船准备检查，返回false为开始失败
 	bool set_loading_ship(Message& message, int load_type, int load_index);				//装船机装船准备检查，返回false为装船启动失败

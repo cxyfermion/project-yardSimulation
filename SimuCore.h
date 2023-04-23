@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 #include <random>
+#include "Message.h"
 
 /*
 * glfwGetTime()返回程序运行的秒数，类型为double
@@ -22,7 +23,7 @@ class SimuCore
 public:
 	SimuCore();
 	void initGuiStyle();								//样式初始化
-	void simulator_gui();							//仿真控制界面
+	void simulator_gui(Message& message);			//仿真控制界面
 	void base_info();								//基本信息显示界面
 	void updateTime();								//更新系统时间
 	float genRandomFloat(float min, float max);		//随机生成一个float

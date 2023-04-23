@@ -1711,7 +1711,7 @@ void Berth::updateBuckets(float gapTime, float simurate)
 	}
 }
 
-int Berth::updateShips(float gapTime, float simurate)
+int Berth::updateShips(Message& message, float gapTime, float simurate)
 {
 	int ship_ret = 0;
 	//船只状态更新代码
@@ -1838,6 +1838,7 @@ int Berth::updateShips(float gapTime, float simurate)
 				it->ship_coords[3] = 3.0f;
 				it->ship_coords[4] = 1.0f - it->ship_current_storage / it->ship_total_storage;
 				it->ship_state = 3;
+				message.push_sound("res/audio/ship.ogg", false);
 			}
 			else
 			{

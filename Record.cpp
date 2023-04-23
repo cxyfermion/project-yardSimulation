@@ -560,6 +560,7 @@ void Record::save_level(int mark, Message& message, bool& random_initiating, int
     file.write((char*)&this->save_file.siloFile.silo_coords, sizeof(this->save_file.siloFile.silo_coords));
     file.close();
     message.push_message(u8"游戏保存成功！");
+    message.push_sound("res/audio/saved.ogg", false);
 }
 
 void Record::load_level(int mark, Message& message, bool& random_initiating, int& compitence, SimuCore& core, Energy& energy, Environment& environment, Web& web, Flow& flow, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo)
@@ -1104,6 +1105,7 @@ void Record::load_level(int mark, Message& message, bool& random_initiating, int
         i1++;
     }
     message.push_message(u8"游戏读取成功！");
+    message.push_sound("res/audio/saved.ogg", false);
 }
 
 void Record::save_energy(int mark, Message& message, SimuCore& core, Energy& energy)
@@ -1132,6 +1134,7 @@ void Record::save_energy(int mark, Message& message, SimuCore& core, Energy& ene
     file.write((char*)&this->statistics.time, sizeof(this->statistics.time));
     file.close();
     message.push_message(u8"能源数据保存成功！");
+    message.push_sound("res/audio/saved.ogg", false);
 }
 
 bool Record::load_energy(int mark)

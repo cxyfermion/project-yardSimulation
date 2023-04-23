@@ -29,7 +29,7 @@ void SimuCore::initGuiStyle()
 	this->style = &ImGui::GetStyle();
 }
 
-void SimuCore::simulator_gui()
+void SimuCore::simulator_gui(Message& message)
 {
 	static float simu_rate = 1.0f;
 	static double terminate = 86400.0;
@@ -43,6 +43,11 @@ void SimuCore::simulator_gui()
 			if (this->simu_pause)
 			{
 				this->simu_lastFrame = this->time;
+				message.push_sound("res/audio/start.ogg", false);
+			}
+			else
+			{
+				message.push_sound("res/audio/pause.ogg", false);
 			}
 			this->simu_pause = !this->simu_pause;
 		}

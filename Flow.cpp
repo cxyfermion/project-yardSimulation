@@ -333,6 +333,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 					it->flow_state = 1;
 					//对应开关柜变为冷备状态
 					energy.coldStart(it->equipments);
+					message.push_sound("res/audio/flow.ogg", false);
 				}
 				else
 				{
@@ -398,6 +399,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 					berth.run_unloader_unloaded(message, it->equipments);
 					//开关柜启动
 					energy.hotStart(it->equipments);
+					message.push_sound("res/audio/flow.ogg", false);
 					it->flow_state = 2;
 				}
 				else
@@ -518,6 +520,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 										bool temp[4] = { berth.webUnloaders[0],berth.webUnloaders[1],berth.webUnloaders[2],berth.webUnloaders[3] };
 										web.begin_flow(it->equipments, type, index, FLUX, temp);
 										it->flow_state = 3;
+										message.push_sound("res/audio/flow.ogg", false);
 									}
 								}
 								yard.send_reset();
@@ -568,6 +571,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 										bool temp[4] = { 0,0,0,0 };
 										web.begin_flow(it->equipments, type, index, FLUX, temp);
 										it->flow_state = 3;
+										message.push_sound("res/audio/flow.ogg", false);
 									}
 									else
 									{
@@ -663,6 +667,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 													bool temp[4] = { 0,0,0,0 };
 													web.begin_flow(it->equipments, artifice_type, artifice_index, FLUX, temp);
 													it->flow_state = 3;
+													message.push_sound("res/audio/flow.ogg", false);
 												}
 											}
 											silo.send_reset();
@@ -702,6 +707,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 								bool temp[4] = { 0,0,0,0 };
 								web.begin_flow(it->equipments, type, index, FLUX, temp);
 								it->flow_state = 3;
+								message.push_sound("res/audio/flow.ogg", false);
 							}
 						}
 					}
@@ -714,9 +720,6 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 						}
 						else if (this->groundSelected && !this->windowGroundChoose)
 						{
-							//皮带变深绿色
-							conv.run_loaded(stoi(it->flow_name), chooseType, chooseIndex, it->equipments);
-							it->flow_state = 3;
 							//装车楼变绿色
 							if (!train.run(it->equipments, chooseType, chooseIndex))
 							{
@@ -724,11 +727,15 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 								//std::cout << "负载运行失败::没有可以载货的火车" << std::endl;
 								message.push_message(u8"负载运行失败::没有可以载货的火车");
 							}
-							//物流网启动
-							if (it->flow_state == 3)
+							else
 							{
+								//皮带变深绿色
+								conv.run_loaded(stoi(it->flow_name), chooseType, chooseIndex, it->equipments);
+								it->flow_state = 3;
+								//物流网启动
 								bool temp[4] = { 0,0,0,0 };
 								web.begin_flow(it->equipments, chooseType, chooseIndex, FLUX, temp);
+								message.push_sound("res/audio/flow.ogg", false);
 							}
 						}
 					}
@@ -766,6 +773,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 					web.end_flow(it->equipments);
 					//按钮变红色
 					it->flow_state = 1;
+					message.push_sound("res/audio/flow.ogg", false);
 				}
 				else
 				{
@@ -850,6 +858,7 @@ void Flow::showGui(Message& message, Energy& energy, Conveyor& conv, SlewingWhee
 					it->flow_state = 0;
 					it->scene_ready = false;
 					this->emergency_stop = false;
+					message.push_sound("res/audio/emergency.ogg", false);
 				}
 				ImGui::SameLine(100.0f);
 				this->style->Colors[ImGuiCol_Button] = ImColor(0, 250, 0, 255);
@@ -1101,12 +1110,13 @@ void Flow::weatherCheck(Message& message, Environment& environment, Energy& ener
 		}
 		if (temp)
 		{
+			message.push_sound("res/audio/emergency.ogg", false);
 			message.push_message(u8"警告::极端天气导致全部流程急停");
 		}
 	}
 }
 
-void Flow::train_check(Energy& energy, int end_train_1, int end_train_2, TrainLoader& train, Yard& yard, Web& web)
+void Flow::train_check(Message& message, Energy& energy, int end_train_1, int end_train_2, TrainLoader& train, Yard& yard, Web& web)
 {
 	if (end_train_1 == 1 || end_train_2 == 1)
 	{
@@ -1129,6 +1139,7 @@ void Flow::train_check(Energy& energy, int end_train_1, int end_train_2, TrainLo
 				web.end_flow(it->equipments);
 				//按钮变红色
 				it->flow_state = 1;
+				message.push_sound("res/audio/flow.ogg", false);
 			}
 		}
 	}
@@ -1153,12 +1164,13 @@ void Flow::train_check(Energy& energy, int end_train_1, int end_train_2, TrainLo
 				web.end_flow(it->equipments);
 				//按钮变红色
 				it->flow_state = 1;
+				message.push_sound("res/audio/flow.ogg", false);
 			}
 		}
 	}
 }
 
-void Flow::stop_yard_flow(Energy& energy, std::string name_wheel, Berth& berth, TrainLoader& train, Silo& silo, Web& web)
+void Flow::stop_yard_flow(Message& message, Energy& energy, std::string name_wheel, Berth& berth, TrainLoader& train, Silo& silo, Web& web)
 {
 	for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
 	{
@@ -1184,6 +1196,7 @@ void Flow::stop_yard_flow(Energy& energy, std::string name_wheel, Berth& berth, 
 					//物流网终止
 					web.end_flow(it1->equipments);
 					it1->flow_state = 1;
+					message.push_sound("res/audio/flow.ogg", false);
 					break;
 				}
 			}
@@ -1191,7 +1204,7 @@ void Flow::stop_yard_flow(Energy& energy, std::string name_wheel, Berth& berth, 
 	}
 }
 
-void Flow::stop_silo_flow(Energy& energy, Yard& yard, Web& web)
+void Flow::stop_silo_flow(Message& message, Energy& energy, Yard& yard, Web& web)
 {
 	for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
 	{
@@ -1211,6 +1224,7 @@ void Flow::stop_silo_flow(Energy& energy, Yard& yard, Web& web)
 				//物流网终止
 				web.end_flow(it1->equipments);
 				it1->flow_state = 1;
+				message.push_sound("res/audio/flow.ogg", false);
 				break;
 			}
 		}
@@ -1323,7 +1337,7 @@ void Flow::ship_leave(Energy& energy, int berth_idx, Yard& yard, Web& web)
 	}
 }
 
-void Flow::end_shiploading(Energy& energy, Berth& berth, Web& web)
+void Flow::end_shiploading(Message& message, Energy& energy, Berth& berth, Web& web)
 {
 	for (std::vector<FlowAttrib>::iterator it1 = this->flows.begin(); it1 != this->flows.end(); it1++)
 	{
@@ -1338,6 +1352,7 @@ void Flow::end_shiploading(Energy& energy, Berth& berth, Web& web)
 			energy.hotEnd(it1->equipments);
 			//物流网终止
 			web.end_flow(it1->equipments);
+			message.push_sound("res/audio/flow.ogg", false);
 			break;
 		}
 	}
@@ -1363,6 +1378,7 @@ void Flow::end_shipunloading(Message& message, Energy& energy, int berth_finishe
 				//转热备
 				energy.hotEnd(it1->equipments);
 				it1->flow_state = 2;
+				message.push_sound("res/audio/flow.ogg", false);
 				break;
 			}
 		}
@@ -1385,14 +1401,16 @@ void Flow::end_shipunloading(Message& message, Energy& energy, int berth_finishe
 				//转热备
 				energy.hotEnd(it1->equipments);
 				it1->flow_state = 2;
+				message.push_sound("res/audio/flow.ogg", false);
 				break;
 			}
 		}
 	}
 }
 
-void Flow::trip_end(bool all, std::vector<std::string> equipments, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web)
+void Flow::trip_end(Message& message, bool all, std::vector<std::string> equipments, Conveyor& conv, SlewingWheel& wheel, Berth& berth, TrainLoader& train, Yard& yard, Silo& silo, Web& web)
 {
+	message.push_sound("res/audio/emergency.ogg", false);
 	if (all)
 	{
 		//大停电

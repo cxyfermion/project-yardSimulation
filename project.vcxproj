@@ -72,12 +72,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>F:\vs_projects\openGL\assimp_src\include;F:\visual studio\openGL\imgui-master\backends;F:\visual studio\openGL\imgui-master;F:\vs_projects\openGL\stb;F:\visual studio\openGL\glm;F:\visual studio\openGL\glad\include;F:\visual studio\openGL\glfw-3.3.8.bin.WIN64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\vs_projects\openGL\assimp_src\lib;F:\visual studio\openGL\glfw-3.3.8.bin.WIN64\lib-vc2022;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\visual studio\openGL\irrKlang-64bit-1.6.0\plugins\ikpMP3;F:\visual studio\openGL\irrKlang-64bit-1.6.0\include;F:\visual studio\openGL\irrKlang-64bit-1.6.0\bin\winx64-visualStudio;F:\vs_projects\openGL\assimp_src\include;F:\visual studio\openGL\imgui-master\backends;F:\visual studio\openGL\imgui-master;F:\vs_projects\openGL\stb;F:\visual studio\openGL\glm;F:\visual studio\openGL\glad\include;F:\visual studio\openGL\glfw-3.3.8.bin.WIN64\include;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\visual studio\openGL\irrKlang-64bit-1.6.0\lib\Winx64-visualStudio;F:\vs_projects\openGL\assimp_src\lib;F:\visual studio\openGL\glfw-3.3.8.bin.WIN64\lib-vc2022;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>F:\vs_projects\openGL\assimp_src\include;F:\visual studio\openGL\imgui-master\backends;F:\visual studio\openGL\imgui-master;F:\vs_projects\openGL\stb;F:\visual studio\openGL\glm;F:\visual studio\openGL\glad\include;F:\visual studio\openGL\glfw-3.3.8.bin.WIN64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\vs_projects\openGL\assimp_src\lib;F:\visual studio\openGL\glfw-3.3.8.bin.WIN64\lib-vc2022;$(LibraryPath)</LibraryPath>
+    <IncludePath>F:\visual studio\openGL\irrKlang-64bit-1.6.0\plugins\ikpMP3;F:\visual studio\openGL\irrKlang-64bit-1.6.0\include;F:\visual studio\openGL\irrKlang-64bit-1.6.0\bin\winx64-visualStudio;F:\vs_projects\openGL\assimp_src\include;F:\visual studio\openGL\imgui-master\backends;F:\visual studio\openGL\imgui-master;F:\vs_projects\openGL\stb;F:\visual studio\openGL\glm;F:\visual studio\openGL\glad\include;F:\visual studio\openGL\glfw-3.3.8.bin.WIN64\include;$(IncludePath)</IncludePath>
+    <LibraryPath>F:\visual studio\openGL\irrKlang-64bit-1.6.0\lib\Winx64-visualStudio;F:\vs_projects\openGL\assimp_src\lib;F:\visual studio\openGL\glfw-3.3.8.bin.WIN64\lib-vc2022;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

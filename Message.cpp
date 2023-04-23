@@ -8,6 +8,7 @@ Message::Message()
 void Message::initGuiStyle()
 {
 	this->style = &ImGui::GetStyle();
+	this->SoundEngine = irrklang::createIrrKlangDevice();
 }
 
 void Message::reset()
@@ -20,6 +21,11 @@ void Message::push_message(std::string error_info)
 {
 	this->messages.push_back(error_info);
 	this->window_message = true;
+}
+
+void Message::push_sound(std::string sound_course, bool looped)
+{
+	SoundEngine->play2D(sound_course.c_str(), looped);
 }
 
 void Message::show()
